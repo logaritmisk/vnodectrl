@@ -1,9 +1,14 @@
-# Install
-$ ./install.sh
+VNodeCtrl
+================================
 
-# Use
-$ vnodectrl
+## Install
+    $ ./install.sh
 
-# SRV sync
+## Usage
+    $ vnodectrl
+
+## Sync srv files
+----
 To sync files you use
-$ vnodectrl srv {host|guest|unison}
+
+    $ vnodectrl srv {host|guest|unison}
