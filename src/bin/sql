@@ -14,15 +14,25 @@ case $1 in
 	cli)
 		ssh -q -oStrictHostKeyChecking=no -t $GUEST_USER@$GUEST_ADDR "mysql -uroot"
 		
-		exit 0
+		exit $?
 	;;
 	dump)
-		ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "echo $GUEST_PASS | sudo -p '' -S ~/guest/sql-dump.sh"
+		ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "sudo -k; echo $GUEST_PASS | sudo -S ~/guest/sql-dump.sh" | tail -n +1
+		
+		R=$?
+		if [ ! $R -eq 0 ]; then
+		    echo "Error: $R"
+		fi
 		
 		exit 0
 	;;
 	restore)
-		ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "echo $GUEST_PASS | sudo -p '' -S ~/guest/sql-restore.sh"
+		ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "sudo -k; echo $GUEST_PASS | sudo -S ~/guest/sql-restore.sh" | tail -n +1
+		
+		R=$?
+        if [ ! $R -eq 0 ]; then
+            echo "Error: $R"
+        fi
 		
 		exit 0
 	;;

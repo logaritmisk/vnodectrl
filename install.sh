@@ -9,7 +9,7 @@ if [ ! -d $APP_FOLDER ]; then
 	sudo mkdir -p $APP_FOLDER
 fi
 
-sudo cp -R $SRC_FOLDER/src/ $APP_FOLDER
+sudo cp -R $SRC_FOLDER/src/* $APP_FOLDER
 
 sudo chmod +x $APP_FOLDER/vnodectrl
 
