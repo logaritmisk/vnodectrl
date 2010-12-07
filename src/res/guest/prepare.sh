@@ -36,6 +36,16 @@ if [ ! -d /srv/vhosts ]; then
     mkdir -p /srv/vhosts
 fi
 
+if [ ! -d /srv/share ]; then
+    mkdir -p /srv/share
+fi
+
+if [ ! -d /srv/drush ]; then
+	mkdir -p /srv/drush
+fi
+
+# Move drushrc to /srv/drush
+mv ~/aliases.drushrc.php /srv/drush
 
 # Remove sites-enabled and use symlink to /srv/vhosts
 if [ ! -L /etc/apache2/sites-enabled ]; then
