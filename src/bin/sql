@@ -1,0 +1,34 @@
+#!/bin/bash
+
+
+. $VNODECTRL_LIB/common
+
+
+if [ ! $# -eq 0 ]; then
+	bootstrap $2
+else
+	${1:-@}
+fi
+
+case $1 in
+	cli)
+		ssh -q -oStrictHostKeyChecking=no -t $GUEST_USER@$GUEST_ADDR "mysql -uroot"
+		
+		exit 0
+	;;
+	dump)
+		ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "echo $GUEST_PASS | sudo -p '' -S ~/guest/sql-dump.sh"
+		
+		exit 0
+	;;
+	restore)
+		ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "echo $GUEST_PASS | sudo -p '' -S ~/guest/sql-restore.sh"
+		
+		exit 0
+	;;
+	*)
+		echo "Usage: `basename $0` {cli|dump|restore}"
+		
+		exit 1
+	;;
+esac

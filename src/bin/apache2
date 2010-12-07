@@ -1,0 +1,10 @@
+#!/bin/bash
+
+
+. $VNODECTRL_LIB/common
+
+
+bootstrap ${@: -1}
+
+
+ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "echo $GUEST_PASS | sudo -p '' -S /etc/init.d/apache2 $1" | tail -n +1

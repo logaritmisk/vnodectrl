@@ -1,0 +1,119 @@
+#!/bin/bash
+
+
+# echo all avalible commands
+function get_all_commands() {
+	echo $(find $VNODECTRL_BIN -type f -perm -100 -exec basename {} \;)
+}
+
+# echo default config
+function get_default_config() {
+	. $VNODECTRL_LOCAL/default.conf
+	
+	echo $DEFAULT_CONFIG
+}
+
+# echo all configs
+function get_all_configs() {
+	echo $(find $VNODECTRL_LOCAL/conf.d/ -type f -exec basename {} \;)
+}
+
+
+
+
+
+function load_settings {
+	if [ ! -f $1 ]; then
+		if [ ${2-1} -eq 1 ]; then
+	    	echo "Could not load configuration '$1'"
+		fi
+		
+	    return 1
+	fi
+	
+	. $1
+	
+	return 0
+}
+
+function server_online {
+	if ! ping -c 1 -W 5 $1 > /dev/null; then
+		if [ ${2-1} -eq 1 ]; then
+			echo "Server is offline."
+		fi
+		
+		return 1
+	fi
+	
+	return 0
+}
+
+function require_root {	
+	if [[ $(/usr/bin/id -u) -ne 0 ]]; then
+		if [ ${1-1} -eq 1 ]; then
+			echo "Require root permissions"
+		fi
+		
+    	return 1
+	fi
+	
+	return 0
+}
+
+function bootstrap {
+	#if [ ! -z $1 ]; then
+		settings=$HOME/.vnodectrl.d/conf.d/$1
+	#fi
+
+	if [ ! -f $settings ]; then
+		if [ ! -f $HOME/.vnodectrl.d/default.conf ]; then
+			touch $HOME/.vnodectrl.d/default.conf
+		fi
+		
+		. $HOME/.vnodectrl.d/default.conf
+		
+		settings=$HOME/.vnodectrl.d/conf.d/$DEFAULT_CONFIG
+	fi
+
+	if [ -z $settings ]; then
+    	echo "There is no default config."
+    	
+		exit 1
+	fi
+
+	if [ ! -f $settings ]; then
+		echo "There is no config file called '$1'."
+
+		exit 1
+	fi
+
+	. $settings
+
+
+	invalid=0
+
+	if [ -z $GUEST_USER ]; then
+		echo "GUEST_USER is not set."
+		
+    	invalid=1
+	fi
+
+	if [ -z $GUEST_PASS ]; then
+		echo "GUEST_PASS is not set."
+		
+		invalid=1
+	fi
+
+	if [ -z $GUEST_ADDR ]; then
+		echo "GUEST_ADDR is not set."
+		
+		invalid=1
+	fi
+
+
+	if [ ! $invalid -eq 0 ]; then
+		echo "Config file is invalid."
+    
+		exit 1
+	fi
+}

@@ -1,0 +1,71 @@
+#!/bin/bash
+
+
+. $VNODECTRL_LIB/common
+
+
+function usage() {
+cat << EOF
+usage: $0 options command
+
+This script run a command on a remote machine.
+
+OPTIONS:
+   -f      Run in matching folder
+   -l      Run on localhost if outside mount
+   -s      Run as sudo
+   -h      Show this message
+
+EOF
+    
+    return 0
+}
+
+
+run_in_folder=false
+run_local=false
+run_sudo=false
+
+while getopts "lh" OPTION; do
+	case $OPTION in
+		f)
+			run_in_folder=true
+		;;
+		l)
+			run_local=true
+		;;
+		s)
+			run_sudo=true
+		;;
+		h)
+			usage
+			exit 1
+		;;
+		?)
+			usage
+			exit 1
+		;;
+	esac
+done
+
+shift $(($OPTIND - 1))
+
+
+
+
+
+
+pwd | grep $(mount | grep ":/srv" | awk '{print $3}') > /dev/null
+
+if [ ! $? -eq 0 ]; then
+    drush $*
+fi
+
+if [ $run_in_folder ]; then
+	P=/srv$(echo $(pwd | grep $(mount | grep ":/srv" | awk '{print $3}')) | sed "s/$(echo $(mount | grep ":/srv" | awk '{print $3}') | sed 's/\//\\\//g')//")
+	cmd="cd $P;"
+fi
+
+ssh ubuntu@192.168.56.10 "drush $*"
+
+

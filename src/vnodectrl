@@ -1,0 +1,81 @@
+#!/bin/bash
+
+
+export VNODECTRL_VERSION="10.11-beta1"
+export VNODECTRL_BASENAME=`basename $0`
+
+export VNODECTRL_ROOT="/opt/vnodectrl.d"
+export VNODECTRL_LOCAL="$HOME/.vnodectrl.d/"
+
+export VNODECTRL_BIN="$VNODECTRL_ROOT/bin"
+export VNODECTRL_LIB="$VNODECTRL_ROOT/lib"
+
+
+. $VNODECTRL_LIB/common
+. $VNODECTRL_LIB/getopts_long
+
+
+function usage() {
+cat << EOF
+usage: $VNODECTRL_BASENAME [options] command
+
+
+Options:
+  -h			Show this message
+
+
+Commands:
+$(for c in $(get_all_commands); do printf "  %s\n" $c; done)
+
+EOF
+}
+
+
+err_msg=''
+call_usage=false
+
+
+if [ $# -eq 0 ]; then
+	set -- "-h"
+fi
+
+while getopts_long "h" opt \
+	help no_argument "" "$@"
+do
+	case "$opt" in
+		h|help)
+			call_usage=true
+		;;
+		:)
+			err_msg=$OPTLERR
+			call_usage=true
+			break
+		;;
+	esac
+done
+
+if $call_usage; then
+	if [ -n "$err_msg" ]; then
+		echo $err_msg
+	fi
+	
+	usage
+	exit 1
+fi
+
+
+shift "$(($OPTLIND - 1))"
+
+
+if [ -x $VNODECTRL_BIN/$1 ]; then
+	cmd=$1
+	shift
+	$VNODECTRL_BIN/$cmd $@
+	exit $?
+fi
+
+
+echo "The `basename $0` command '$1' could not be found."
+
+
+exit 1

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+
+. $VNODECTRL_LIB/common
+
+
+bootstrap ${@: -1}
+
+
+echo         "This will reboot the server."
+read -n 1 -p "Do you want to continue? (Y/n): " choice && choice=${choice:-Y}
+echo         ""
+
+if [ ! $choice = 'y' ] && [ ! $choice = 'Y' ]; then
+	exit 1
+fi
+
+
+ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "sudo -k; echo $GUEST_PASS | sudo -S reboot | tail -n +1"
