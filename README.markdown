@@ -1,14 +1,12 @@
-VNodeCtrl
-================================
+# VNodeCtrl
 
-## Install
+### Install
     $ ./install.sh
 
-## Usage
+### Usage
     $ vnodectrl
 
-## Sync srv files
-----
+### Sync srv files
 To sync files you use
 
     $ vnodectrl srv {host|guest|unison}
