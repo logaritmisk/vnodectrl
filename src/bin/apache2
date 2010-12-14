@@ -1,10 +1,13 @@
 #!/bin/bash
 
 
-. $VNODECTRL_LIB/common
+# api_version=1
 
 
-bootstrap ${@: -1}
+function apache2_info() {
+    echo "Control apache2 on guest system"
+}
 
-
-ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "echo $GUEST_PASS | sudo -p '' -S /etc/init.d/apache2 $1" | tail -n +1
+function apache2_exec() {
+    ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "echo $GUEST_PASS | sudo -p '' -S /etc/init.d/apache2 $1" | tail -n +1
+}

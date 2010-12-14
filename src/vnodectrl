@@ -1,39 +1,81 @@
 #!/bin/bash
 
 
-export VNODECTRL_VERSION="10.11-beta1"
-export VNODECTRL_BASENAME=`basename $0`
+VNODECTRL_VERSION="10.12-alpha1"
+VNODECTRL_BASENAME=`basename $0`
 
-export VNODECTRL_ROOT="/opt/vnodectrl.d"
-export VNODECTRL_LOCAL="$HOME/.vnodectrl.d/"
+VNODECTRL_ROOT=`dirname $0`
+#VNODECTRL_ROOT="/opt/vnodectrl.d"
+VNODECTRL_LOCAL="$HOME/.vnodectrl.d/"
 
-export VNODECTRL_BIN="$VNODECTRL_ROOT/bin"
-export VNODECTRL_LIB="$VNODECTRL_ROOT/lib"
+VNODECTRL_BIN="$VNODECTRL_ROOT/bin"
+VNODECTRL_LIB="$VNODECTRL_ROOT/lib"
 
 
-. $VNODECTRL_LIB/common
+#. $VNODECTRL_LIB/common
 . $VNODECTRL_LIB/getopts_long
 
 
-function usage() {
+
+
+for p in $(find $VNODECTRL_BIN -type f -perm -100 -exec basename {} \;); do
+    path=$VNODECTRL_BIN/$p
+    api_version=$(grep -ioE '^[ \t]*#[ \t]*api_version=[0-9]+[ \t]*$' $path | sed -E 's/.*([0-9]+).*/\1/')
+    
+    if [ ${api_version:-0} -eq 1 ]; then
+        . $path
+        
+        VNODECTRL_PLUGINS[${#plugins[@]}]=$p
+    fi
+done
+
+
+
+function _print_plugins_info() {
+    local info
+    
+    for p in ${VNODECTRL_PLUGINS[@]}; do
+        info=''
+        if type -t "${p}_info" > /dev/null; then
+            info=$("${p}_info")
+        fi
+        
+        printf "  %-32s%s\n" $p "$info"
+    done
+}
+
+
+
+function core_help() {
+    if [ -n "$error_msg" ]; then
+    	echo $error_msg
+    fi
+
 cat << EOF
 usage: $VNODECTRL_BASENAME [options] command
 
 
 Options:
-  -h			Show this message
+  -h	  		          Show this message
 
 
 Commands:
-$(for c in $(get_all_commands); do printf "  %s\n" $c; done)
+$(_print_plugins_info)
 
 EOF
+
+    return 0
+}
+
+function core_completion() {
+    echo ${VNODECTRL_PLUGINS[@]}
 }
 
 
-err_msg=''
-call_usage=false
 
+
+error_msg=''
+call_usage=false
 
 if [ $# -eq 0 ]; then
 	set -- "-h"
@@ -47,7 +89,7 @@ do
 			call_usage=true
 		;;
 		:)
-			err_msg=$OPTLERR
+			error_msg=$OPTLERR
 			call_usage=true
 			break
 		;;
@@ -55,27 +97,19 @@ do
 done
 
 if $call_usage; then
-	if [ -n "$err_msg" ]; then
-		echo $err_msg
-	fi
-	
-	usage
+	core_help
 	exit 1
 fi
 
-
 shift "$(($OPTLIND - 1))"
 
-
-if [ -x $VNODECTRL_BIN/$1 ]; then
-	cmd=$1
-	shift
-	$VNODECTRL_BIN/$cmd $@
-	exit $?
+if ! type -t "${1}_exec" > /dev/null; then
+    core_help
+    exit 1
 fi
 
 
-echo "The `basename $0` command '$1' could not be found."
+"${1}_exec"
 
 
-exit 1
+exit $?
