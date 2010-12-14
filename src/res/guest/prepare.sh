@@ -3,11 +3,16 @@
 # The first argument is sudo password for current user
 # @author Anders Olsson (logaritmisk)
 
-mkdir -p ~/.vnodectrl.d/ssh > /dev/null
+echo -n "has a id_dsa file been generated? "
+if [ ! -f ~/.vnodectrl.d/ssh/id_dsa ]; then
+    echo "no"
+    
+    mkdir -p ~/.vnodectrl.d/ssh > /dev/null
 
-
-ssh-keygen -t dsa -N '' -f ~/.vnodectrl.d/ssh/id_dsa > /dev/null
-
+    ssh-keygen -t dsa -N '' -f ~/.vnodectrl.d/ssh/id_dsa
+else
+    echo "yes"
+fi
 
 # Bak folder used with unison
 if [ ! -d /bak ]; then
@@ -45,7 +50,7 @@ if [ ! -d /srv/drush ]; then
 fi
 
 # Move drushrc to /srv/drush
-mv ~/aliases.drushrc.php /srv/drush
+mv ~/guest/drush/* /srv/drush
 
 # Remove sites-enabled and use symlink to /srv/vhosts
 if [ ! -L /etc/apache2/sites-enabled ]; then

@@ -4,6 +4,22 @@
 
 
 . $VNODECTRL_LIB/common
+. $VNODECTRL_LIB/getopts_long
+
+
+force=false
+
+while getopts_long "f" opt \
+	force no_argument "" "$@"
+do
+	case "$opt" in
+		f|force)
+			force=true
+		;;
+	esac
+done
+
+shift "$(($OPTLIND - 1))"
 
 
 bootstrap $1
@@ -23,8 +39,14 @@ fi
 # Check if guest has been prepared.
 ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "test -f ~/.vnodectrl.d/ssh/id_dsa.pub"
 
-if [ ! $? -eq 0 ]; then
-	echo "This guest isn't prepared."
+R=$?
+
+if [ ! $R -eq 0 ] || [ $force ]; then
+    if [ ! $R -eq 0 ]; then
+	    echo "This guest isn't prepared."
+	else
+	    echo "This guest has been prepared before."
+	fi
 	
 	read -n 1 -p "Do you want to prepare it? (Y/n): " choice && choice=${choice:-Y}
 	echo ''
