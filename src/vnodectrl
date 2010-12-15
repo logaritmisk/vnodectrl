@@ -10,13 +10,49 @@ VNODECTRL_LOCAL="$HOME/.vnodectrl.d/"
 VNODECTRL_BIN="$VNODECTRL_ROOT/bin"
 VNODECTRL_LIB="$VNODECTRL_ROOT/lib"
 
+VNODECTRL_DEFAULT_CONF="$VNODECTRL_LOCAL/config"
+VNODECTRL_IDENTIFIERS="$VNODECTRL_LOCAL/identifier"
+
 
 #. $VNODECTRL_LIB/common
 . $VNODECTRL_LIB/getopts_long
 
 
+load_config() {
+    if [ ! -f $VNODECTRL_DEFAULT_CONF ]; then
+        touch $VNODECTRL_DEFAULT_CONF
+    fi
 
-function _print_plugins_info() {
+    . $VNODECTRL_DEFAULT_CONF
+}
+
+list_identifiers() {
+    local f identifiers
+    
+    for f in $(find $VNODECTRL_IDENTIFIERS/* -iname "*.conf" -exec basename {} \;); do
+        identifiers[${#identifiers[@]}]=${f%%.*}
+    done
+    
+    echo ${identifiers[@]}
+}
+
+load_identifier() {
+    if [ -z $1 ]; then
+        return 1
+    fi
+    
+    if [[ " $(list_identifiers) " =~ " $1 " ]]; then
+        . $VNODECTRL_IDENTIFIERS/$1.conf
+        
+        return 0
+    fi
+    
+    return 1
+}
+
+
+
+_print_plugins_info() {
     local info
     
     for p in ${VNODECTRL_PLUGINS[@]}; do
@@ -30,7 +66,8 @@ function _print_plugins_info() {
 }
 
 
-function core_help() {
+
+core_help() {
     if [ -n "$error_msg" ]; then
     	echo $error_msg
     fi
@@ -51,7 +88,7 @@ EOF
     return 0
 }
 
-function core_completion() {
+core_completion() {
     echo ${VNODECTRL_PLUGINS[@]}
 }
 

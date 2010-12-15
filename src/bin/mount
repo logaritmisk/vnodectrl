@@ -3,11 +3,11 @@
 # api_version=1
 
 
-function mount_info() {
+mount_info() {
     echo "Mount guest system on host"
 }
 
-function mount_exec() {
+mount_exec() {
     mount | egrep "^$(echo $GUEST_ADDR | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
     
     if [ $? -eq 0 ]; then

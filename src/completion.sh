@@ -11,7 +11,7 @@ _vnodectrl() {
     	    else
 	            plugin=''
 	        fi
-	    elif [[ $c == -h|help ]]; then
+	    elif [[ $c == -h ]] || [[ $c == --help ]]; then
 	        plugin=''
     	fi
 	fi

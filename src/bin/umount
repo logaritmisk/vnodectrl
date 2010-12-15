@@ -3,11 +3,11 @@
 # api_version=1
 
 
-function umount_info() {
+umount_info() {
     echo "Umount guest system"
 }
 
-function umount_exec() {
+umount_exec() {
     mount | egrep "^$(echo $GUEST_ADDR | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
 
     if [ ! $? -eq 0 ]; then
