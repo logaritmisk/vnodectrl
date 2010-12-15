@@ -1,72 +1,75 @@
 #!/bin/bash
 
-
-. $VNODECTRL_LIB/common
-
-
-if [ ! $# -eq 0 ]; then
-	bootstrap $2
-else
-	${1:-@}
-fi
+# api_version=1
 
 
-mount | egrep "^$(echo $GUEST_ADDR | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
+srv_info() {
+    echo "Sync files between host and guest"
+}
 
-if [ $? -eq 0 ]; then
-    echo "Can't sync srv folder while mount is up."
-    echo "Please unmount with 'vnodectrl umount' and try again."
-    exit 1
-fi
-
-
-case $1 in
-	host)
-		echo         "This might delete files from host:/srv folder."
-		read -n 1 -p "Do you still want to continue? (y/N): " choice && choice=${choice:-N}
-		echo         ""
-		
-		if [ $choice = 'n' ] || [ $choice = 'N' ]; then
-			exit 1
-		fi
-		
-		rsync -azrPq --delete $GUEST_USER@$GUEST_ADDR:/srv/ $SRV_FOLDER
-		
-		exit 0
-	;;
-	guest)
-		echo         "This might delete files from guest:/srv folder."
-		read -n 1 -p "Do you still want to continue? (y/N): " choice && choice=${choice:-N}
-		echo         ""
-		
-		if [ $choice = 'n' ] || [ $choice = 'N' ]; then
-			exit 1
-		fi
-		
-		rsync -azrPq --delete $SRV_FOLDER/ $GUEST_USER@$GUEST_ADDR:/srv
-		
-		exit 0
-	;;
-	unison)
-		rsync -azrPq --delete $SRV_FOLDER/ $GUEST_USER@$GUEST_ADDR:/bak
-		
-		if [ ! $? -eq 0 ]; then
-			exit 1
-		fi
-		
-		ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "unison -auto /bak /srv"
-		
-		if [ ! $? -eq 0 ]; then
-			exit 1
-		fi
-		
-		rsync -azrPq --delete $GUEST_USER@$GUEST_ADDR:/bak/ $SRV_FOLDER
-		
-		exit 0
-	;;
-	*)
-		echo "Usage: `basename $0` {host|guest|unison}"
-		
-		exit 1
-	;;
-esac
+srv_exec() {
+    local \
+        guest_user=$(vnode_identity_get 'guest_user') \
+        guest_addr=$(vnode_identity_get 'guest_addr') \
+        srv_folder=$(vnode_identity_get 'srv_folder')
+    
+    mount | egrep "^$(echo $guest_user | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
+    
+    if [ $? -eq 0 ]; then
+        echo "Can't sync srv folder while mount is up."
+        echo "Please unmount with 'vnodectrl umount' and try again."
+        exit 1
+    fi
+    
+    
+    case $1 in
+    	host)
+    		echo         "This might delete files from host:/srv folder."
+    		read -n 1 -p "Do you still want to continue? (y/N): " choice && choice=${choice:-N}
+    		echo         ""
+    		
+    		if [ $choice = 'n' ] || [ $choice = 'N' ]; then
+    			exit 1
+    		fi
+    		
+    		rsync -azrPq --delete $guest_user@$guest_addr:/srv/ $srv_folder
+    		
+    		exit 0
+    	;;
+    	guest)
+    		echo         "This might delete files from guest:/srv folder."
+    		read -n 1 -p "Do you still want to continue? (y/N): " choice && choice=${choice:-N}
+    		echo         ""
+    		
+    		if [ $choice = 'n' ] || [ $choice = 'N' ]; then
+    			exit 1
+    		fi
+    		
+    		rsync -azrPq --delete $srv_folder/ $guest_user@$guest_addr:/srv
+    		
+    		exit 0
+    	;;
+    	unison)
+    		rsync -azrPq --delete $srv_folder/ $guest_user@$guest_addr:/bak
+    		
+    		if [ ! $? -eq 0 ]; then
+    			exit 1
+    		fi
+    		
+    		ssh -q -oStrictHostKeyChecking=no $guest_user@$guest_addr "unison -auto /bak /srv"
+    		
+    		if [ ! $? -eq 0 ]; then
+    			exit 1
+    		fi
+    		
+    		rsync -azrPq --delete $guest_user@$guest_addr:/bak/ $srv_folder
+    		
+    		exit 0
+    	;;
+    	*)
+    		echo "Usage: `basename $0` {host|guest|unison}"
+    		
+    		exit 1
+    	;;
+    esac
+}

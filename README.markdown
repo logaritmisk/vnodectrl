@@ -17,10 +17,10 @@ To sync files you use
 
 
 ### API
-
     # basic variable functions
     vnode_variable_get <file> <variable> [default]
     vnode_variable_set <file> <variable> <value>
+
 
     # wraps vnode_variable_(get|set)
     vnode_config_get <variable> [default]

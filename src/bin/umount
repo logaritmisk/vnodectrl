@@ -8,7 +8,7 @@ umount_info() {
 }
 
 umount_exec() {
-    mount | egrep "^$(echo $GUEST_ADDR | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
+    mount | egrep "^$(echo $(vnode_identity_get 'guest_addr') | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
 
     if [ ! $? -eq 0 ]; then
         echo "There is no mount to unmount."
@@ -16,5 +16,5 @@ umount_exec() {
     fi
 
 
-    sudo umount $SRV_FOLDER
+    sudo umount $(vnode_identity_get 'srv_folder')
 }

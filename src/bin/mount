@@ -8,7 +8,7 @@ mount_info() {
 }
 
 mount_exec() {
-    mount | egrep "^$(echo $GUEST_ADDR | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
+    mount | egrep "^$(echo $(vnode_identity_get 'guest_addr') | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
     
     if [ $? -eq 0 ]; then
         echo "There is already a mount."
@@ -16,5 +16,5 @@ mount_exec() {
     fi
 
 
-    sudo mount -oactimeo=3 $GUEST_ADDR:/srv $SRV_FOLDER
+    sudo mount -oactimeo=3 $(vnode_identity_get 'guest_addr'):/srv $(vnode_identity_get 'srv_folder')
 }

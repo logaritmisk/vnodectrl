@@ -18,7 +18,6 @@ VNODECTRL_IDENTIFIERS="$VNODECTRL_LOCAL/identifier"
 
 
 . $VNODECTRL_LIB/core
-. $VNODECTRL_LIB/identity
 . $VNODECTRL_LIB/getopts_long
 
 
@@ -78,6 +77,8 @@ done
 error_msg=''
 call_usage=false
 
+vnode_identity_unload
+
 if [ $# -eq 0 ]; then
 	set -- "-h"
 fi
@@ -89,8 +90,7 @@ while getopts_long "hi:" opt \
 do
 	case "$opt" in
 	    i)
-	        echo ${OPTLARG}
-	        exit 1
+	        vnode_identity_load ${OPTLARG}
 	    ;;
 	    completion)
 	        if type -t "${OPTLARG}_completion" > /dev/null; then
