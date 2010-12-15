@@ -1,6 +1,102 @@
 #!/bin/bash
 
 
+# Get variable from file
+# @author Anders Olsson
+vnode_variable_get() {
+    local var
+    
+    if (( $# < 2 )); then
+        return 1
+    fi
+    
+    if [ ! -f $1 ]; then
+        return 1
+    fi
+    
+    var=$(grep -o "^$2=.*$" $1 | sed -E -e 's/.*=//')
+    
+    echo ${var:-$3}
+    
+    return 0
+}
+
+# Set variable to file
+# @author Anders Olsson
+vnode_variable_set() {
+    if [ ! $# -eq 3 ]; then
+        return 1
+    fi
+    
+    if [ ! -f $1 ]; then
+        return 1
+    fi
+    
+    sed -i "" "/^$2=.*$/d" $1 > /dev/null
+    
+    if [ -n "$3" ]; then
+        echo "$2=$3" | tee -a $1 > /dev/null
+    fi
+    
+    return 0
+}
+
+# Get variable from default config file
+# @author Anders Olsson
+vnode_config_get() {
+    if [ ! -f $VNODECTRL_CONFIG ]; then
+        touch $VNODECTRL_CONFIG
+    fi
+    
+    vnode_variable_get $VNODECTRL_CONFIG $@
+    
+    return 0
+}
+
+# Set variable to default config file
+# @author Anders Olsson
+vnode_config_set() {
+    if [ ! -f $VNODECTRL_CONFIG ]; then
+        touch $VNODECTRL_CONFIG
+    fi
+    
+    vnode_variable_set $VNODECTRL_CONFIG $@
+    
+    return 0
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # echo default config
 function get_default_config() {
 	. $VNODECTRL_LOCAL/default.conf

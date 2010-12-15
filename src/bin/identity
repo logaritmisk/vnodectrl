@@ -46,6 +46,8 @@ identity_exec() {
     		;;
     		c)
     			call='_identity_create_identifier'
+    			shift
+    			args=$@
     			break
     		;;
     		h|help)
@@ -67,11 +69,11 @@ identity_exec() {
 }
 
 _identity_list_identifiers() {
-	local default=$(config_get "default_identifier") info
+	local default=$(vnode_config_get "default_identifier") info
 	
 	echo "Identifier(s):"
 	
-	for i in $(list_identifiers); do
+	for i in $(vnode_identity_list); do
 	    info=''
 		if [ "$default" == "$i" ]; then
 			info='(default)'
@@ -87,7 +89,7 @@ _identity_list_identifiers() {
 
 _identity_default_identifier() {
 	if [ -z $1 ]; then
-		local default=$(config_get "default_identifier")
+		local default=$(vnode_config_get "default_identifier")
 		
 		if [ -z $default ]; then
 			echo "There is no default identifier."
@@ -97,13 +99,13 @@ _identity_default_identifier() {
 		
 		echo "$default"
 	else
-    	if [[ ! " $(list_identifiers) " =~ " $1 " ]]; then
+    	if [[ ! " $(vnode_identity_list) " =~ " $1 " ]]; then
     	    echo "Invalid identifier"
     	    
     	    return 1
     	fi
 		
-		config_set "default_identifier" "$1"
+		vnode_config_set "default_identifier" "$1"
 		
 		echo "Config '$1' is now set as default."
 	fi
@@ -112,35 +114,33 @@ _identity_default_identifier() {
 }
 
 _identity_create_identifier() {
-	local srv_folder guest_user guest_pass guest_addr
-	local cfg_name=$1 cfg_path
-	local input='@' choice
+    local name=$1 path input='@' choice
 	
-	if [ -z "$cfg_name" ]; then
-		read -p "Configuration name: " input
+	if [ -z "$name" ]; then
+		read -p "Identifier name: " input
 		echo ''
 		
-		cfg_name=$input
+		name=$input
 	fi
 	
-	
-	cfg_path=$VNODECTRL_LOCAL/conf.d/$cfg_name
-	
-	
-	if [ -f $cfg_path ]; then
-		echo "A configuration with name '$cfg_name' already exists."
-		read -n 1 -p "Do you want overwrite it? (y/N): " choice && choice=${choice:-Y}
-		echo ''
-		
-		if [ $choice = 'n' ] || [ $choice = 'N' ]; then
-			return 1
-		fi
+	if [[ " $(vnode_identity_list) " =~ " $name " ]]; then
+        echo "A identity with name '$name' already exists."
+        read -n 1 -p "Do you want overwrite it? (y/N): " choice && choice=${choice:-N}
+        echo ''
+        
+        if [ $choice = 'n' ] || [ $choice = 'N' ]; then
+        	return 1
+        fi
 	fi
 	
+	path=$VNODECTRL_IDENTIFIERS/$name.conf
 	
-	# Get path to virtual folder
+	if [ ! -f $path ]; then
+	    touch $path
+	fi
+	
 	while [ ! -d $input ]; do
-		read -e -p "Local SRV folder [$srv_folder]: " input && eval input=$input
+		read -e -p "Local SRV folder: " input && eval input=$input
 		
 		if [ ! -d $input ]; then
 			read -n 1 -p "Folder '$input' doesn't exist, do you want create it? (Y/n): " choice && choice=${choice:-Y}
@@ -154,20 +154,14 @@ _identity_create_identifier() {
 		fi
 	done
 	
-	srv_folder=$(echo ${input:-$srv_folder} | sed 's/[ \t\/]*$//')
+	vnode_variable_set $path "srv_folder" $(echo ${input:-$srv_folder} | sed 's/[ \t\/]*$//')
 	
+	read -p "Guest username: " input
+	vnode_variable_set $path "guest_user" ${input}
 	
-	# Get guest username
-	read -p "Guest username [$guest_user]: " input
-	guest_user=${input:-$guest_user}
+	read -p "Guest password: " input
+	vnode_variable_set $path "guest_pass" ${input}
 	
-	
-	# Get guest password
-	read -p "Guest password [$guest_pass]: " input
-	guest_pass=${input:-$guest_pass}
-	
-	
-	# Get guest address
-	read -p "Guest address [$guest_addr]: " input
-	guest_addr=${input:-$guest_addr}
+	read -p "Guest address: " input
+	vnode_variable_set $path "guest_addr" ${input}
 }

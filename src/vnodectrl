@@ -1,11 +1,14 @@
 #!/bin/bash
 
+# Control virtual image
+# @author Anders Olsson
+
 
 VNODECTRL_VERSION="10.12-alpha1"
 VNODECTRL_BASENAME=`basename $0`
 
 VNODECTRL_ROOT="/opt/vnodectrl.d"
-VNODECTRL_LOCAL="$HOME/.vnodectrl.d/"
+VNODECTRL_LOCAL="$HOME/.vnodectrl.d"
 
 VNODECTRL_BIN="$VNODECTRL_ROOT/bin"
 VNODECTRL_LIB="$VNODECTRL_ROOT/lib"
@@ -14,35 +17,9 @@ VNODECTRL_CONFIG="$VNODECTRL_LOCAL/config"
 VNODECTRL_IDENTIFIERS="$VNODECTRL_LOCAL/identifier"
 
 
-#. $VNODECTRL_LIB/common
-. $VNODECTRL_LIB/config
+. $VNODECTRL_LIB/core
+. $VNODECTRL_LIB/identity
 . $VNODECTRL_LIB/getopts_long
-
-
-list_identifiers() {
-    local f identifiers
-    
-    for f in $(find $VNODECTRL_IDENTIFIERS/* -iname "*.conf" -exec basename {} \;); do
-        identifiers[${#identifiers[@]}]=${f%%.*}
-    done
-    
-    echo ${identifiers[@]}
-}
-
-load_identifier() {
-    if [ -z $1 ]; then
-        return 1
-    fi
-    
-    if [[ " $(list_identifiers) " =~ " $1 " ]]; then
-        . $VNODECTRL_IDENTIFIERS/$1.conf
-        
-        return 0
-    fi
-    
-    return 1
-}
-
 
 
 _print_plugins_info() {

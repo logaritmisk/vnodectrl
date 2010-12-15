@@ -1,0 +1,28 @@
+#!/bin/bash
+
+
+# @author Anders Olsson
+vnode_identity_list() {
+    local f identifiers
+    
+    for f in $(find $VNODECTRL_IDENTIFIERS/* -iname "*.conf" -exec basename {} \;); do
+        identifiers[${#identifiers[@]}]=${f%%.*}
+    done
+    
+    echo ${identifiers[@]}
+}
+
+# @author Anders Olsson
+vnode_identity_load() {
+    if [ ! $# -eq 1 ]; then
+        return 1
+    fi
+    
+    if [[ " $(vnode_identity_list) " =~ " $1 " ]]; then
+        # . $VNODECTRL_IDENTIFIERS/$1.conf
+        
+        return 0
+    fi
+    
+    return 1
+}
