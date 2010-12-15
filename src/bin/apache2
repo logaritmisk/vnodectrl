@@ -8,6 +8,10 @@ function apache2_info() {
     echo "Control apache2 on guest system"
 }
 
+function apache2_completion() {
+    echo "start stop reload restart"
+}
+
 function apache2_exec() {
     ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "echo $GUEST_PASS | sudo -p '' -S /etc/init.d/apache2 $1" | tail -n +1
 }

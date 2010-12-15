@@ -4,8 +4,8 @@
 VNODECTRL_VERSION="10.12-alpha1"
 VNODECTRL_BASENAME=`basename $0`
 
-VNODECTRL_ROOT=`dirname $0`
-#VNODECTRL_ROOT="/opt/vnodectrl.d"
+#VNODECTRL_ROOT=`dirname $0`
+VNODECTRL_ROOT="/opt/vnodectrl.d"
 VNODECTRL_LOCAL="$HOME/.vnodectrl.d/"
 
 VNODECTRL_BIN="$VNODECTRL_ROOT/bin"
@@ -14,20 +14,6 @@ VNODECTRL_LIB="$VNODECTRL_ROOT/lib"
 
 #. $VNODECTRL_LIB/common
 . $VNODECTRL_LIB/getopts_long
-
-
-
-
-for p in $(find $VNODECTRL_BIN -type f -perm -100 -exec basename {} \;); do
-    path=$VNODECTRL_BIN/$p
-    api_version=$(grep -ioE '^[ \t]*#[ \t]*api_version=[0-9]+[ \t]*$' $path | sed -E 's/.*([0-9]+).*/\1/')
-    
-    if [ ${api_version:-0} -eq 1 ]; then
-        . $path
-        
-        VNODECTRL_PLUGINS[${#plugins[@]}]=$p
-    fi
-done
 
 
 
@@ -43,7 +29,6 @@ function _print_plugins_info() {
         printf "  %-32s%s\n" $p "$info"
     done
 }
-
 
 
 function core_help() {
@@ -73,6 +58,16 @@ function core_completion() {
 
 
 
+for p in $(find $VNODECTRL_BIN -type f -perm -100 -exec basename {} \;); do
+    path=$VNODECTRL_BIN/$p
+    api_version=$(grep -ioE '^[ \t]*#[ \t]*api_version=[0-9]+[ \t]*$' $path | sed -E 's/.*([0-9]+).*/\1/')
+    
+    if [ ${api_version:-0} -eq 1 ]; then
+        . $path
+        
+        VNODECTRL_PLUGINS[${#plugins[@]}]=$p
+    fi
+done
 
 error_msg=''
 call_usage=false
@@ -81,10 +76,23 @@ if [ $# -eq 0 ]; then
 	set -- "-h"
 fi
 
-while getopts_long "h" opt \
-	help no_argument "" "$@"
+while getopts_long "hi:" opt \
+	help no_argument \
+	completion required_argument \
+	"" "$@"
 do
 	case "$opt" in
+	    i)
+	        echo ${OPTLARG}
+	        exit 1
+	    ;;
+	    completion)
+	        if type -t "${OPTLARG}_completion" > /dev/null; then
+	            "${OPTLARG}_completion"
+	            exit 0
+	        fi
+	        exit 1
+	    ;;
 		h|help)
 			call_usage=true
 		;;
@@ -108,8 +116,6 @@ if ! type -t "${1}_exec" > /dev/null; then
     exit 1
 fi
 
-
 "${1}_exec"
-
 
 exit $?
