@@ -147,11 +147,15 @@ fi
 
 shift "$(($OPTLIND - 1))"
 
-if ! type -t "${1}_exec" > /dev/null; then
+plugin=$1
+
+if ! type -t "${plugin}_exec" > /dev/null; then
     core_help
     exit 1
 fi
 
-"${1}_exec"
+shift
+
+"${plugin}_exec" "$@"
 
 exit $?

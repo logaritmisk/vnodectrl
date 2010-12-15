@@ -3,20 +3,19 @@
 # Manage vnodectrl config files
 # @author Anders Olsson (logaritmisk <anders@nodeone.se>)
 
-
-. $VNODECTRL_LIB/common
-. $VNODECTRL_LIB/getopts_long
+# api_version=1
 
 
-function usage() {
+config_info() {
+    echo "Manage indentifiers"
+}
+
+config_help() {
 cat << EOF
-usage: $VNODECTRL_BASENAME `basename $0` [options]
-
-
 Options:
-  -l			List configurations
-  -d			Set default config
-  -c            Create a new config
+  -l			List identifiers
+  -d			Set default identifier
+  -c            Create a new identifier
   -h			Show this message
 
 EOF
@@ -24,20 +23,18 @@ EOF
 	return 0
 }
 
-function list_configs() {
-	local default_cfg=$(get_default_config)
-	local ext
+_config_list_configs() {
+	local default='' info
 	
-	echo "Config(s):"
+	echo "Identifier(s):"
 	
-	for c in $(get_all_configs); do
-		if [ $default_cfg == $c ]; then
-			ext="(default)"
-		else
-			ext=""
+	for i in $(list_identifiers); do
+	    info=''
+		if [ "$default" == "$i" ]; then
+			info='(default)'
 		fi
 		
-		printf "  %s %s\n" $c $ext
+		printf "  %s %s\n" $i $info
 	done
 	
 	echo
@@ -45,7 +42,7 @@ function list_configs() {
 	return 0
 }
 
-function default_config() {
+_config_default_config() {
 	if [ -z $args ]; then
 		local default_cfg=$(get_default_config)
 		
@@ -74,7 +71,7 @@ function default_config() {
 	return 0
 }
 
-function create_config() {
+_config_create_config() {
 	local srv_folder
 	local guest_user
 	local guest_pass
@@ -151,75 +148,42 @@ GUEST_ADDR=$guest_addr
 EOF
 }
 
-
-call=''
-
-
-if [ $# -eq 0 ]; then
-	set -- "-h"
-fi
-
-while getopts_long ":hld:c" opt \
-	help no_argument "" "$@"
-do
-	case "$opt" in
-		l)
-			call='list_configs'
-		;;
-		d)
-			call='default_config'
-			args=$OPTLARG
-		;;
-		c)
-			call='create_config'
-		;;
-		h|help)
-			call='usage'
-		;;
-		:)
-			call='usage'
-			printf >&2 '%s: %s\n' "${0##*/}" "$OPTLERR"
-			break
-		;;
-	esac
-done
-
-shift "$(($OPTLIND - 1))"
-
-$call $@
-
-exit 1
-
-
-
-
-
-
-
-
-load_settings "$VNODECTRL_HOME/default.conf" 0
-
-
-if [ ! -d ~/.vnodectrl.d/conf.d ]; then
-	mkdir -p ~/.vnodectrl.d/conf.d
-fi
-
-
-if [ ! -z $1 ]; then
-	settings=~/.vnodectrl.d/conf.d/$1
-	
-	if [ ! -f ~/.vnodectrl.d/conf.d/$1 ]; then
-		echo "There is no config file called '$1'."
-		
-		read -n 1 -p "Do you want to create it? (Y/n): " choice && choice=${choice:-Y}
-		echo ''
-		
-		if [ $choice = 'y' ] || [ $choice = 'Y' ]; then
-			echo ''
-		else
-			exit 1
-		fi
-	else
-		. $settings
-	fi
-fi
+config_exec() {
+    local call=''
+    
+    if [ $# -eq 0 ]; then
+    	set -- "-h"
+    fi
+    
+    while getopts_long ":hld:c" opt \
+    	help no_argument \
+    	"" "$@"
+    do
+    	case "$opt" in
+    		l)
+    			call='_config_list_configs'
+    		;;
+    		d)
+    			call='_config_default_config'
+    			args=$OPTLARG
+    		;;
+    		c)
+    			call='_config_create_config'
+    		;;
+    		h|help)
+    			call='config_help'
+    		;;
+    		:)
+    			call='config_help'
+    			printf >&2 '%s: %s\n' "${0##*/}" "$OPTLERR"
+    			break
+    		;;
+    	esac
+    done
+    
+    shift "$(($OPTLIND - 1))"
+    
+    $call $@
+    
+    exit 1
+}
