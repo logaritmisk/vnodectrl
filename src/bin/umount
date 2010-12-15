@@ -1,18 +1,20 @@
 #!/bin/bash
 
-
-. $VNODECTRL_LIB/common
-
-
-bootstrap ${@: -1}
+# api_version=1
 
 
-mount | egrep "^$(echo $GUEST_ADDR | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
+function umount_info() {
+    echo "Umount guest system"
+}
 
-if [ ! $? -eq 0 ]; then
-    echo "There is no mount to unmount."
-    exit 1
-fi
+function umount_exec() {
+    mount | egrep "^$(echo $GUEST_ADDR | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
+
+    if [ ! $? -eq 0 ]; then
+        echo "There is no mount to unmount."
+        return 1
+    fi
 
 
-sudo umount $SRV_FOLDER
+    sudo umount $SRV_FOLDER
+}

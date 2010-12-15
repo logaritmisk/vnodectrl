@@ -4,7 +4,6 @@
 VNODECTRL_VERSION="10.12-alpha1"
 VNODECTRL_BASENAME=`basename $0`
 
-#VNODECTRL_ROOT=`dirname $0`
 VNODECTRL_ROOT="/opt/vnodectrl.d"
 VNODECTRL_LOCAL="$HOME/.vnodectrl.d/"
 
@@ -65,7 +64,7 @@ for p in $(find $VNODECTRL_BIN -type f -perm -100 -exec basename {} \;); do
     if [ ${api_version:-0} -eq 1 ]; then
         . $path
         
-        VNODECTRL_PLUGINS[${#plugins[@]}]=$p
+        VNODECTRL_PLUGINS[${#VNODECTRL_PLUGINS[@]}]=$p
     fi
 done
 
