@@ -1,0 +1,173 @@
+#!/bin/bash
+
+# Manage vnodectrl config files
+# @author Anders Olsson (logaritmisk <anders@nodeone.se>)
+
+# api_version=1
+
+
+identity_info() {
+    echo "Manage indentifiers"
+}
+
+identity_help() {
+cat << EOF
+Options:
+  -l	  		          List identifiers
+  -d	  		          Set default identifier
+  -c	  		          Create a new identifier
+  -h	  		          Show this message
+
+EOF
+
+	return 0
+}
+
+identity_exec() {
+    local call='' args=''
+    
+    if [ $# -eq 0 ]; then
+    	set -- "-h"
+    fi
+    
+    while getopts_long ":hld:c" opt \
+    	help no_argument \
+    	"" "$@"
+    do
+    	case "$opt" in
+    		l)
+    			call='_identity_list_identifiers'
+    			break
+    		;;
+    		d)
+    			call='_identity_default_identifier'
+    			args=$OPTLARG
+    			break
+    		;;
+    		c)
+    			call='_identity_create_identifier'
+    			break
+    		;;
+    		h|help)
+    			call='identity_help'
+    			break
+    		;;
+    		:)
+    			call='identity_help'
+    			break
+    		;;
+    	esac
+    done
+    
+    shift "$(($OPTLIND - 1))"
+    
+    $call $args
+    
+    exit 1
+}
+
+_identity_list_identifiers() {
+	local default=$(config_get "default_identifier") info
+	
+	echo "Identifier(s):"
+	
+	for i in $(list_identifiers); do
+	    info=''
+		if [ "$default" == "$i" ]; then
+			info='(default)'
+		fi
+		
+		printf "  %s %s\n" $i $info
+	done
+	
+	echo
+	
+	return 0
+}
+
+_identity_default_identifier() {
+	if [ -z $1 ]; then
+		local default=$(config_get "default_identifier")
+		
+		if [ -z $default ]; then
+			echo "There is no default identifier."
+			
+			return 1
+		fi
+		
+		echo "$default"
+	else
+    	if [[ ! " $(list_identifiers) " =~ " $1 " ]]; then
+    	    echo "Invalid identifier"
+    	    
+    	    return 1
+    	fi
+		
+		config_set "default_identifier" "$1"
+		
+		echo "Config '$1' is now set as default."
+	fi
+	
+	return 0
+}
+
+_identity_create_identifier() {
+	local srv_folder guest_user guest_pass guest_addr
+	local cfg_name=$1 cfg_path
+	local input='@' choice
+	
+	if [ -z "$cfg_name" ]; then
+		read -p "Configuration name: " input
+		echo ''
+		
+		cfg_name=$input
+	fi
+	
+	
+	cfg_path=$VNODECTRL_LOCAL/conf.d/$cfg_name
+	
+	
+	if [ -f $cfg_path ]; then
+		echo "A configuration with name '$cfg_name' already exists."
+		read -n 1 -p "Do you want overwrite it? (y/N): " choice && choice=${choice:-Y}
+		echo ''
+		
+		if [ $choice = 'n' ] || [ $choice = 'N' ]; then
+			return 1
+		fi
+	fi
+	
+	
+	# Get path to virtual folder
+	while [ ! -d $input ]; do
+		read -e -p "Local SRV folder [$srv_folder]: " input && eval input=$input
+		
+		if [ ! -d $input ]; then
+			read -n 1 -p "Folder '$input' doesn't exist, do you want create it? (Y/n): " choice && choice=${choice:-Y}
+			echo ''
+			
+			if [ $choice = 'y' || $choice = 'Y' ]; then
+				mkdir -p $input
+			else
+				return 1
+			fi
+		fi
+	done
+	
+	srv_folder=$(echo ${input:-$srv_folder} | sed 's/[ \t\/]*$//')
+	
+	
+	# Get guest username
+	read -p "Guest username [$guest_user]: " input
+	guest_user=${input:-$guest_user}
+	
+	
+	# Get guest password
+	read -p "Guest password [$guest_pass]: " input
+	guest_pass=${input:-$guest_pass}
+	
+	
+	# Get guest address
+	read -p "Guest address [$guest_addr]: " input
+	guest_addr=${input:-$guest_addr}
+}

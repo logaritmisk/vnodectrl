@@ -10,21 +10,14 @@ VNODECTRL_LOCAL="$HOME/.vnodectrl.d/"
 VNODECTRL_BIN="$VNODECTRL_ROOT/bin"
 VNODECTRL_LIB="$VNODECTRL_ROOT/lib"
 
-VNODECTRL_DEFAULT_CONF="$VNODECTRL_LOCAL/config"
+VNODECTRL_CONFIG="$VNODECTRL_LOCAL/config"
 VNODECTRL_IDENTIFIERS="$VNODECTRL_LOCAL/identifier"
 
 
 #. $VNODECTRL_LIB/common
+. $VNODECTRL_LIB/config
 . $VNODECTRL_LIB/getopts_long
 
-
-load_config() {
-    if [ ! -f $VNODECTRL_DEFAULT_CONF ]; then
-        touch $VNODECTRL_DEFAULT_CONF
-    fi
-
-    . $VNODECTRL_DEFAULT_CONF
-}
 
 list_identifiers() {
     local f identifiers

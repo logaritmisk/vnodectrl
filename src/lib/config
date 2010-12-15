@@ -1,0 +1,37 @@
+#!/bin/bash
+
+config_get() {
+    local var
+    
+    if (( $# < 1 )); then
+        return 1
+    fi
+    
+    if [ ! -f $VNODECTRL_CONFIG ]; then
+        touch $VNODECTRL_CONFIG
+    fi
+    
+    var=$(grep -o "^$1=.*$" $VNODECTRL_CONFIG | sed -E -e 's/.*=//')
+    
+    echo ${var:-$2}
+    
+    return 0
+}
+
+config_set() {
+    if [ ! $# -eq 2 ]; then
+        return 1
+    fi
+    
+    if [ ! -f $VNODECTRL_CONFIG ]; then
+        touch $VNODECTRL_CONFIG
+    fi
+    
+    sed -i "" "/^$1=.*$/d" $VNODECTRL_CONFIG > /dev/null
+    
+    if [ -n "$2" ]; then
+        echo "$1=$2" | tee -a $VNODECTRL_CONFIG > /dev/null
+    fi
+    
+    return 0
+}
