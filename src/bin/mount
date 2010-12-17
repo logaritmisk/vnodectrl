@@ -22,7 +22,7 @@ mount_exec() {
         srv_folder=$(vnode_identity_get 'srv_folder')
 
 
-    if [ mount_is_mounted ]; then
+    if mount_is_mounted; then
         echo "There is already a mount."
         return 1
     fi
@@ -42,7 +42,9 @@ mount_exec() {
 mount_is_mounted() {
     local guest_addr=$(vnode_identity_get 'guest_addr')
 
-    mount | egrep "^$(echo $guest_addr | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
-
-    return $?
+    if mount | egrep "^$(echo $guest_addr | sed 's/\./\\\./g'):/srv on.*$" > /dev/null; then
+        return 0
+    fi
+    
+    return 1
 }

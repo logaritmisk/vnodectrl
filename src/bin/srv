@@ -32,7 +32,7 @@ srv_completion() {
 #
 # @author Anders Olsson
 srv_exec() {
-    if [ mount_is_mounted ]; then
+    if mount_is_mounted; then
         echo "Can't sync srv folder while mount is up."
         echo "Please unmount with 'vnodectrl umount' and try again."
         return 1
@@ -40,20 +40,20 @@ srv_exec() {
 
     case $1 in
     	host)
-    		return srv_sync_host
+    		srv_sync_host
     	;;
     	guest)
-            return srv_sync_guest
+            srv_sync_guest
     	;;
     	unison)
-            return srv_sync_unison
+            srv_sync_unison
     	;;
     	*)
     		srv_help
     	;;
     esac
 
-    return 0
+    return $?
 }
 
 

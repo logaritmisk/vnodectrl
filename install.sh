@@ -15,11 +15,11 @@ sudo chmod +x $APP_FOLDER/vnodectrl
 
 sudo ln -sf $APP_FOLDER/vnodectrl /usr/bin/
 
-if [ ! -d $HOME/.vnodectrl.d ]; then
+if [ ! -d $HOME/.vnodectrl.d/identifier ]; then
 	mkdir -p $HOME/.vnodectrl.d/identifier
 fi
 
 if ! grep "source $APP_FOLDER/completion.sh" $HOME/.bashrc > /dev/null; then
 	echo -e "\nsource $APP_FOLDER/completion.sh" >> $HOME/.bashrc
-	. $HOME/.bashrc
+	. $APP_FOLDER/completion.sh
 fi

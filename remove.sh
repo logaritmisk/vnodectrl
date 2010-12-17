@@ -14,5 +14,4 @@ fi
 
 if grep "source $APP_FOLDER/completion.sh" $HOME/.bashrc > /dev/null; then
  	sed "/$(echo "source $APP_FOLDER/completion.sh" | sed 's/\//\\\//g')/d" $HOME/.bashrc | tee $HOME/.bashrc.bak && mv $HOME/.bashrc.bak $HOME/.bashrc
-	. $HOME/.bashrc
 fi
