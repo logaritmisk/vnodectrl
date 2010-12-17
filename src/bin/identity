@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Manage vnodectrl config files
+# Manage vnodectrl identity files
 # @author Anders Olsson (logaritmisk <anders@nodeone.se>)
 
 # api_version=1

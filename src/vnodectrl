@@ -21,21 +21,6 @@ VNODECTRL_IDENTIFIERS="$VNODECTRL_LOCAL/identifier"
 . $VNODECTRL_LIB/getopts_long
 
 
-_print_plugins_info() {
-    local info
-    
-    for p in ${VNODECTRL_PLUGINS[@]}; do
-        info=''
-        if type -t "${p}_info" > /dev/null; then
-            info=$("${p}_info")
-        fi
-        
-        printf "  %-32s%s\n" $p "$info"
-    done
-}
-
-
-
 core_help() {
     if [ -n "$error_msg" ]; then
     	echo $error_msg
@@ -61,6 +46,19 @@ core_completion() {
     echo ${VNODECTRL_PLUGINS[@]}
 }
 
+
+_print_plugins_info() {
+    local info
+    
+    for p in ${VNODECTRL_PLUGINS[@]}; do
+        info=''
+        if type -t "${p}_info" > /dev/null; then
+            info=$("${p}_info")
+        fi
+        
+        printf "  %-32s%s\n" $p "$info"
+    done
+}
 
 
 for p in $(find $VNODECTRL_BIN -type f -perm -100 -exec basename {} \;); do
