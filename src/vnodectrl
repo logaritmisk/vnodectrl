@@ -4,7 +4,7 @@
 # @author Anders Olsson
 
 
-VNODECTRL_VERSION="10.12-alpha1"
+VNODECTRL_VERSION="10.12-alpha2"
 VNODECTRL_BASENAME=`basename $0`
 
 VNODECTRL_ROOT="/opt/vnodectrl.d"

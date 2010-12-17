@@ -1,20 +1,48 @@
 #!/bin/bash
 
+
+# Main functions for plugin mount.
+#
 # api_version=1
 
 
+# Implementation of hook_info
+#
+# @author Anders Olsson
 mount_info() {
     echo "Mount guest system on host"
 }
 
+# Implementation of hook_exec
+#
+# @author Anders Olsson
 mount_exec() {
-    mount | egrep "^$(echo $(vnode_identity_get 'guest_addr') | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
-    
-    if [ $? -eq 0 ]; then
+    local \
+        guest_addr=$(vnode_identity_get 'guest_addr') \
+        srv_folder=$(vnode_identity_get 'srv_folder')
+
+
+    if [ mount_is_mounted ]; then
         echo "There is already a mount."
         return 1
     fi
 
 
-    sudo mount -oactimeo=3 $(vnode_identity_get 'guest_addr'):/srv $(vnode_identity_get 'srv_folder')
+    sudo mount -oactimeo=3 $guest_addr:/srv $srv_folder
+}
+
+
+
+# API for srv
+
+
+# Check if guest is mounted.
+#
+# @author Anders Olsson
+mount_is_mounted() {
+    local guest_addr=$(vnode_identity_get 'guest_addr')
+
+    mount | egrep "^$(echo $guest_addr | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
+
+    return $?
 }

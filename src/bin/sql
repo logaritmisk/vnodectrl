@@ -13,36 +13,37 @@ sql_exec() {
         guest_pass=$(vnode_identity_get 'guest_pass') \
         guest_addr=$(vnode_identity_get 'guest_addr')
 
+
     case $1 in
     	cli)
-    		ssh -q -oStrictHostKeyChecking=no -t $guest_user@$guest_addr "mysql -uroot"
+    		ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "mysql -uroot"
     		
-    		exit $?
+    		return $?
     	;;
     	dump)
-    		ssh -q -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -k; echo $guest_pass | sudo -S ~/guest/sql-dump.sh" | tail -n +1
+    		ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -k; echo $guest_pass | sudo -S ~/guest/sql-dump.sh" | tail -n +1
     		
     		R=$?
     		if [ ! $R -eq 0 ]; then
     		    echo "Error: $R"
     		fi
     		
-    		exit 0
+    		return 0
     	;;
     	restore)
-    		ssh -q -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -k; echo $guest_pass | sudo -S ~/guest/sql-restore.sh" | tail -n +1
+    		ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -k; echo $guest_pass | sudo -S ~/guest/sql-restore.sh" | tail -n +1
     		
     		R=$?
             if [ ! $R -eq 0 ]; then
                 echo "Error: $R"
             fi
     		
-    		exit 0
+    		return 0
     	;;
     	*)
     		echo "Usage: `basename $0` {cli|dump|restore}"
     		
-    		exit 1
+    		return 1
     	;;
     esac
 }

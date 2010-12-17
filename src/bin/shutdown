@@ -13,6 +13,7 @@ shutdown_exec() {
         guest_pass=$(vnode_identity_get 'guest_pass') \
         guest_addr=$(vnode_identity_get 'guest_addr')
 
+
     echo         "This will shutdown the server."
     read -n 1 -p "Do you want to continue? (Y/n): " choice && choice=${choice:-Y}
     echo         ""
@@ -22,5 +23,5 @@ shutdown_exec() {
     fi
 
 
-    ssh -q -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -k; echo $guest_pass | sudo -S shutdown -P 0 | tail -n +1"
+    ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -k; echo $guest_pass | sudo -S shutdown -P 0 | tail -n +1"
 }

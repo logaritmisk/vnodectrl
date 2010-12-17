@@ -1,20 +1,34 @@
 #!/bin/bash
 
+
+# Main functions for plugin umount.
+#
 # api_version=1
+# dependencies=mount
 
 
+# Implementation of hook_info
+#
+# @author Anders Olsson
 umount_info() {
     echo "Umount guest system"
 }
 
+# Implementation of hook_exec
+#
+# @author Anders Olsson
 umount_exec() {
-    mount | egrep "^$(echo $(vnode_identity_get 'guest_addr') | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
+    local srv_folder=$(vnode_identity_get 'srv_folder')
 
-    if [ ! $? -eq 0 ]; then
+
+    if [ ! mount_is_mounted ]; then
         echo "There is no mount to unmount."
         return 1
     fi
 
 
-    sudo umount $(vnode_identity_get 'srv_folder')
+    sudo umount $srv_folder
+
+
+    return $?
 }

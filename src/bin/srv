@@ -1,32 +1,43 @@
 #!/bin/bash
 
+
+# Main functions for plugin srv.
+#
 # api_version=1
+# dependencies=mount
 
 
+# Implementation of hook_info
+#
+# @author Anders Olsson
 srv_info() {
     echo "Sync files between host and guest"
 }
 
+# Implementation of hook_help
+#
+# @author Anders Olsson
 srv_help() {
-    echo "Usage: `basename $0` {host|guest|unison}"
+    echo "Usage: srv {host|guest|unison}"
 }
 
+# Implementation of hook_completion
+#
+# @author Anders Olsson
+srv_completion() {
+    echo "host guest unison"
+}
+
+# Implementation of hook_exec
+#
+# @author Anders Olsson
 srv_exec() {
-    local \
-        guest_user=$(vnode_identity_get 'guest_user') \
-        guest_addr=$(vnode_identity_get 'guest_addr') \
-        srv_folder=$(vnode_identity_get 'srv_folder')
-    
-    
-    mount | egrep "^$(echo $guest_addr | sed 's/\./\\\./g'):/srv on.*$" > /dev/null
-    
-    if [ $? -eq 0 ]; then
+    if [ mount_is_mounted ]; then
         echo "Can't sync srv folder while mount is up."
         echo "Please unmount with 'vnodectrl umount' and try again."
         return 1
     fi
-    
-    
+
     case $1 in
     	host)
     		return srv_sync_host
@@ -41,11 +52,25 @@ srv_exec() {
     		srv_help
     	;;
     esac
-    
+
     return 0
 }
 
+
+
+# API for srv
+
+
+# One way sync of host system.
+#
+# @author Anders Olsson
 srv_sync_host() {
+    local \
+        guest_user=$(vnode_identity_get 'guest_user') \
+        guest_addr=$(vnode_identity_get 'guest_addr') \
+        srv_folder=$(vnode_identity_get 'srv_folder')
+
+
     echo         "This might delete files from host:/srv folder."
     read -n 1 -p "Do you still want to continue? (y/N): " choice && choice=${choice:-N}
     echo         ""
@@ -59,7 +84,16 @@ srv_sync_host() {
     return $?
 }
 
+# One way sync of guest system.
+#
+# @author Anders Olsson
 srv_sync_guest() {
+    local \
+        guest_user=$(vnode_identity_get 'guest_user') \
+        guest_addr=$(vnode_identity_get 'guest_addr') \
+        srv_folder=$(vnode_identity_get 'srv_folder')
+
+
     echo         "This might delete files from guest:/srv folder."
     read -n 1 -p "Do you still want to continue? (y/N): " choice && choice=${choice:-N}
     echo         ""
@@ -70,17 +104,27 @@ srv_sync_guest() {
 
     rsync -azrPq --delete $srv_folder/ $guest_user@$guest_addr:/srv
 
-    return 0
+    return $?
 }
 
+# Two way sync using unison.
+# http://www.cis.upenn.edu/~bcpierce/unison/
+#
+# @author Anders Olsson
 srv_sync_unison() {
+    local \
+        guest_user=$(vnode_identity_get 'guest_user') \
+        guest_addr=$(vnode_identity_get 'guest_addr') \
+        srv_folder=$(vnode_identity_get 'srv_folder')
+
+
     rsync -azrPq --delete $srv_folder/ $guest_user@$guest_addr:/bak
 
     if [ ! $? -eq 0 ]; then
     	return 1
     fi
 
-    ssh -q -oStrictHostKeyChecking=no $guest_user@$guest_addr "unison -auto /bak /srv"
+    ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "unison -auto /bak /srv"
 
     if [ ! $? -eq 0 ]; then
     	return 1
@@ -88,5 +132,5 @@ srv_sync_unison() {
 
     rsync -azrPq --delete $guest_user@$guest_addr:/bak/ $srv_folder
 
-    return 0
+    return $?
 }

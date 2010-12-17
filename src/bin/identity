@@ -1,15 +1,25 @@
 #!/bin/bash
 
 # Manage vnodectrl identity files
-# @author Anders Olsson (logaritmisk <anders@nodeone.se>)
+# @author Anders Olsson <anders@nodeone.se>
 
+
+
+# Main functions for plugin identity.
+#
 # api_version=1
 
 
+# Implementation of hook_info
+#
+# @author Anders Olsson
 identity_info() {
     echo "Manage indentifiers"
 }
 
+# Implementation of hook_help
+#
+# @author Anders Olsson
 identity_help() {
 cat << EOF
 Options:
@@ -23,6 +33,9 @@ EOF
 	return 0
 }
 
+# Implementation of hook_exec
+#
+# @author Anders Olsson
 identity_exec() {
     local call='' args=''
     
@@ -67,6 +80,11 @@ identity_exec() {
     
     exit 1
 }
+
+
+
+# Private functions
+
 
 _identity_list_identifiers() {
 	local default=$(vnode_config_get "default_identifier") info
