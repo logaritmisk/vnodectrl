@@ -32,5 +32,5 @@ shutdown_exec() {
     fi
 
 
-    ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -k; echo $guest_pass | sudo -S shutdown -P 0 | tail -n +1"
+    ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -k; echo $guest_pass | sudo -S shutdown -P 0" | tail -n +1
 }
