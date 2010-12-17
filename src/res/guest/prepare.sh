@@ -52,6 +52,12 @@ fi
 # Move drushrc to /srv/drush
 mv ~/guest/drush/* /srv/drush
 
+if [ ! -d $HOME/.drush ]; then
+    ln -s /srv/drush $HOME/.drush
+fi
+
+
+
 # Remove sites-enabled and use symlink to /srv/vhosts
 if [ ! -L /etc/apache2/sites-enabled ]; then
     echo $1 | sudo -S rm -r /etc/apache2/sites-enabled
