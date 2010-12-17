@@ -1,17 +1,27 @@
 #!/bin/bash
 
+
+# Main functions for plugin reboot.
+#
 # api_version=1
 
 
+# Implementation of hook_info
+#
+# @author Anders Olsson
 reboot_info() {
     echo "Restart guest system"
 }
 
+# Implementation of hook_exec
+#
+# @author Anders Olsson
 reboot_exec() {
     local \
         guest_user=$(vnode_identity_get 'guest_user') \
         guest_pass=$(vnode_identity_get 'guest_pass') \
         guest_addr=$(vnode_identity_get 'guest_addr')
+
 
     echo         "This will reboot the server."
     read -n 1 -p "Do you want to continue? (Y/n): " choice && choice=${choice:-Y}

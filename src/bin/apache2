@@ -1,16 +1,37 @@
 #!/bin/bash
 
+
+# Main functions for plugin apache2
+#
 # api_version=1
 
 
+# Implementation of hook_info
+#
+# @author Anders Olsson
 apache2_info() {
     echo "Control apache2 on guest system"
 }
 
+# Implementation of hook_completion
+#
+# @author Anders Olsson
 apache2_completion() {
     echo "start stop reload restart"
 }
 
+# Implementation of hook_exec
+#
+# @author Anders Olsson
 apache2_exec() {
-    ssh -qt -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "echo $GUEST_PASS | sudo -p '' -S /etc/init.d/apache2 $1" | tail -n +1
+    local \
+        guest_user=$(vnode_identity_get 'guest_user') \
+        guest_pass=$(vnode_identity_get 'guest_pass') \
+        guest_addr=$(vnode_identity_get 'guest_addr')
+
+
+    ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -k; echo $guest_pass | sudo -S /etc/init.d/apache2 $1" | tail -n +1
+
+
+    return $?
 }

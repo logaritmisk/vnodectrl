@@ -1,12 +1,21 @@
 #!/bin/bash
 
+
+# Main functions for plugin shutdown.
+#
 # api_version=1
 
 
+# Implementation of hook_info
+#
+# @author Anders Olsson
 shutdown_info() {
     echo "Shutdown guest system"
 }
 
+# Implementation of hook_exec
+#
+# @author Anders Olsson
 shutdown_exec() {
     local \
         guest_user=$(vnode_identity_get 'guest_user') \
