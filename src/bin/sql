@@ -21,6 +21,17 @@ sql_help() {
     echo "You can start cli, dump and restore"
 }
 
+# Implementation of hook_completion
+#
+# @author Anders Olsson
+sql_completion() {
+    if [ $CWORD -eq 0 ]; then
+        echo "cli dump restore"
+    fi
+    
+    return 0
+}
+
 # Implementation of hook_exec
 #
 # @author Anders Olsson
