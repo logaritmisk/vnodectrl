@@ -51,7 +51,7 @@ prepare_exec() {
     ssh -q -oStrictHostKeyChecking=no $guest_user@$guest_addr "mkdir ~/.ssh > /dev/null 2>&1; echo "`cat ~/.ssh/id_dsa.pub`" >> ~/.ssh/authorized_keys"
     
     if [ ! $? -eq 0 ]; then
-    	echo "Faild to authorize host."
+    	echo "Faild to authorize host ($guest_user@$guest_addr)"
     	return 1
     fi
     
@@ -102,91 +102,3 @@ prepare_exec() {
 
     return 0
 }
-
-
-return 0
-
-
-#!/bin/bash
-
-# @author Anders Olsson (logaritmisk)
-
-
-. $VNODECTRL_LIB/common
-. $VNODECTRL_LIB/getopts_long
-
-
-force=false
-
-while getopts_long "f" opt \
-	force no_argument "" "$@"
-do
-	case "$opt" in
-		f|force)
-			force=true
-		;;
-	esac
-done
-
-shift "$(($OPTLIND - 1))"
-
-
-bootstrap $1
-
-
-# Remove guest from known_hosts.
-ssh-keygen -R $GUEST_ADDR > /dev/null 2>&1
-
-#Copy host ssh key to guest.
-ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "mkdir ~/.ssh > /dev/null 2>&1; echo "`cat ~/.ssh/id_dsa.pub`" >> ~/.ssh/authorized_keys"
-
-if [ ! $? -eq 0 ]; then
-	echo "Faild to authorize host."
-	exit 1
-fi
-
-# Check if guest has been prepared.
-ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "test -f ~/.vnodectrl.d/ssh/id_dsa.pub"
-
-R=$?
-
-if [ ! $R -eq 0 ] || [ $force ]; then
-    if [ ! $R -eq 0 ]; then
-	    echo "This guest isn't prepared."
-	else
-	    echo "This guest has been prepared before."
-	fi
-	
-	read -n 1 -p "Do you want to prepare it? (Y/n): " choice && choice=${choice:-Y}
-	echo ''
-	
-	if [ $choice = 'y' ] || [ $choice = 'Y' ]; then
-		scp -r $VNODECTRL_ROOT/res/guest $GUEST_USER@$GUEST_ADDR:~/ > /dev/null 2>&1
-		
-		if [ ! $? -eq 0 ]; then
-			echo "Faild to prepare guest. (SCP)"
-			
-			exit 1
-		fi
-		
-		ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "~/guest/prepare.sh '$GUEST_PASS'"
-		
-		if [ ! $? == '0' ]; then
-			echo "Faild to prepare guest. (SSH)"
-			
-			exit 1
-		fi
-	else
-		exit 1
-	fi
-fi
-
-exit 1
-
-# Get ssh key from guest
-GUEST_SSH_KEY=$(ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "cat ~/.vnodectrl.d/ssh/id_dsa.pub")
-
-echo $GUEST_SSH_KEY | tee -a ~/.ssh/authorized_keys > /dev/null
-
-uniq ~/.ssh/authorized_keys ~/.ssh/authorized_keys.old && \
-mv ~/.ssh/authorized_keys.old ~/.ssh/authorized_keys

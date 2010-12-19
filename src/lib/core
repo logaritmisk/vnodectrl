@@ -4,6 +4,7 @@
 # ---------- vnode_variable ----------
 
 # Get variable from file
+#
 # @author Anders Olsson
 vnode_variable_get() {
     local var
@@ -24,6 +25,7 @@ vnode_variable_get() {
 }
 
 # Set variable to file
+#
 # @author Anders Olsson
 vnode_variable_set() {
     if [ ! $# -eq 3 ]; then
@@ -48,6 +50,7 @@ vnode_variable_set() {
 # ---------- vnode_config ----------
 
 # Get variable from default config file
+#
 # @author Anders Olsson
 vnode_config_get() {
     if [ ! -f $VNODECTRL_CONFIG ]; then
@@ -60,6 +63,7 @@ vnode_config_get() {
 }
 
 # Set variable to default config file
+#
 # @author Anders Olsson
 vnode_config_set() {
     if [ ! -f $VNODECTRL_CONFIG ]; then
@@ -75,8 +79,15 @@ vnode_config_set() {
 
 # ---------- vnode_identity ----------
 
+# List all existing identifiers
+#
+# @author Anders Olsson
 vnode_identity_list() {
     local f identifiers
+    
+    if [ ! -d $VNODECTRL_IDENTIFIERS ]; then
+        mkdir -p $VNODECTRL_IDENTIFIERS
+    fi
     
     for f in $(find $VNODECTRL_IDENTIFIERS/* -iname "*.conf" -exec basename {} \;); do
         identifiers[${#identifiers[@]}]=${f%%.*}
@@ -85,6 +96,9 @@ vnode_identity_list() {
     echo ${identifiers[@]}
 }
 
+# Check if identity exist
+#
+# @input identity
 vnode_identity_exists() {
     if [ ! $# -eq 1 ]; then
         return 1
@@ -167,47 +181,32 @@ vnode_identity_set() {
 
 
 
+# ---------- host ----------
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function _____server_online {
-	if ! ping -c 1 -W 5 $1 > /dev/null; then
-		if [ ${2-1} -eq 1 ]; then
-			echo "Server is offline."
-		fi
-		
-		return 1
-	fi
-	
-	return 0
+# Control if a host is online using ping.
+#
+# @author Anders Olsson
+#
+# @input host_address
+host_is_online() {
+    if ! ping -c 1 -W 5 $1 > /dev/null; then
+    	return 1
+    fi
+    
+    return 0
 }
 
-function _____require_root {	
-	if [[ $(id -u) -ne 0 ]]; then
-		if [ ${1-1} -eq 1 ]; then
-			echo "Require root permissions"
-		fi
-		
+
+
+# ---------- vnode ----------
+
+# Check if local user is root
+#
+# @author Anders Olsson
+vnode_is_root() {
+    if [ $(id -u) -ne 0 ]; then
     	return 1
-	fi
-	
-	return 0
+    fi
+
+    return 0
 }

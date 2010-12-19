@@ -17,9 +17,8 @@ mount_info() {
 #
 # @author Anders Olsson
 mount_exec() {
-    local \
-        guest_addr=$(vnode_identity_get 'guest_addr') \
-        srv_folder=$(vnode_identity_get 'srv_folder')
+    local guest_addr=$(vnode_identity_get 'guest_addr')
+    local srv_folder=$(vnode_identity_get 'srv_folder')
 
 
     if mount_is_mounted; then
@@ -28,13 +27,41 @@ mount_exec() {
     fi
 
 
-    sudo mount -oactimeo=3 $guest_addr:/srv $srv_folder
+    mount_mount_sshfs
+
+
+    return $?
 }
 
 
 
-# API for srv
+# API for mount
 
+
+mount_mount_nfs() {
+    local \
+        guest_addr=$(vnode_identity_get 'guest_addr') \
+        srv_folder=$(vnode_identity_get 'srv_folder')
+
+
+    sudo mount -oactimeo=3 $guest_addr:/srv $srv_folder
+
+
+    return $?
+}
+
+mount_mount_sshfs() {
+    local \
+        guest_user=$(vnode_identity_get 'guest_user') \
+        guest_addr=$(vnode_identity_get 'guest_addr') \
+        srv_folder=$(vnode_identity_get 'srv_folder')
+
+
+    sudo sshfs $guest_user@$guest_addr:/srv $srv_folder
+
+
+    return $?
+}
 
 # Check if guest is mounted.
 #

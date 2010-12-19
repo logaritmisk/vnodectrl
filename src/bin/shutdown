@@ -17,20 +17,30 @@ shutdown_info() {
 #
 # @author Anders Olsson
 shutdown_exec() {
-    local \
-        guest_user=$(vnode_identity_get 'guest_user') \
-        guest_pass=$(vnode_identity_get 'guest_pass') \
-        guest_addr=$(vnode_identity_get 'guest_addr')
+    local guest_user=$(vnode_identity_get 'guest_user')
+    local guest_pass=$(vnode_identity_get 'guest_pass')
+    local guest_addr=$(vnode_identity_get 'guest_addr')
+    
+
+    if ! host_is_online $guest_addr; then
+        echo "Can't connect to server. Are you sure it's online?"
+        echo ""
+        
+        return 1
+    fi
 
 
     echo         "This will shutdown the server."
     read -n 1 -p "Do you want to continue? (Y/n): " choice && choice=${choice:-Y}
     echo         ""
 
-    if [ ! $choice = 'y' ] && [ ! $choice = 'Y' ]; then
+    if [[ ! $choice == [yY] ]]; then
 	    exit 1
     fi
 
 
     ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -k; echo $guest_pass | sudo -S shutdown -P 0" | tail -n +1
+
+
+    return $?
 }

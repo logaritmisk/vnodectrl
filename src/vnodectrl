@@ -1,37 +1,42 @@
 #!/bin/bash
 
-# Control virtual image
+# Control a virtual server using basic commands.
+#
 # @author Anders Olsson
 
 
-VNODECTRL_VERSION="10.12-alpha2"
-VNODECTRL_BASENAME=`basename $0`
+readonly VNODECTRL_VERSION="10.12-alpha3"
+readonly VNODECTRL_BASENAME=`basename $0`
 
-VNODECTRL_ROOT="/opt/vnodectrl.d"
-VNODECTRL_LOCAL="$HOME/.vnodectrl.d"
+readonly VNODECTRL_ROOT="/opt/vnodectrl.d"
+readonly VNODECTRL_LOCAL="$HOME/.vnodectrl.d"
 
-VNODECTRL_BIN="$VNODECTRL_ROOT/bin"
-VNODECTRL_LIB="$VNODECTRL_ROOT/lib"
+readonly VNODECTRL_BIN="$VNODECTRL_ROOT/bin"
+readonly VNODECTRL_LIB="$VNODECTRL_ROOT/lib"
 
-VNODECTRL_CONFIG="$VNODECTRL_LOCAL/config"
-VNODECTRL_IDENTIFIERS="$VNODECTRL_LOCAL/identifier"
+readonly VNODECTRL_CONFIG="$VNODECTRL_LOCAL/config"
+readonly VNODECTRL_IDENTIFIERS="$VNODECTRL_LOCAL/identifier"
 
 
 . $VNODECTRL_LIB/core
 . $VNODECTRL_LIB/getopts_long
 
 
+# Implementation of hook_help
+#
+# @author Anders Olsson <anders.olsson@nodeone.se>
 core_help() {
     if [ -n "$error_msg" ]; then
     	echo $error_msg
     fi
 
-cat << EOF
+    cat << EOF
 usage: $VNODECTRL_BASENAME [options] command
 
 
 Options:
   -h	  		          Show this message
+  -i identifier           Specifies identifier
 
 
 Commands:
@@ -42,6 +47,9 @@ EOF
     return 0
 }
 
+# Implementation of hook_completion
+#
+# @author Anders Olsson <anders.olsson@nodeone.se>
 core_completion() {
     echo ${VNODECTRL_PLUGINS[@]}
 }
@@ -83,7 +91,7 @@ fi
 
 while getopts_long "hi:" opt \
 	help no_argument \
-	completion required_argument \
+	completion no_argument \
 	"" "$@"
 do
 	case "$opt" in
@@ -91,10 +99,29 @@ do
 	        vnode_identity_load ${OPTLARG}
 	    ;;
 	    completion)
-	        if type -t "${OPTLARG}_completion" > /dev/null; then
-	            "${OPTLARG}_completion"
+    	    shift "$(($OPTLIND - 1))"
+    	    
+	        CWORD=$1
+	        
+	        shift
+	        
+	        WORDS=( $@ )
+	        
+	        if [ $CWORD -eq 1 ]; then
+	            plugin='core'
+            else
+	            plugin=${WORDS[1]:-core}
+	        fi
+
+	        if type -t "${plugin}_completion" > /dev/null; then
+	            let 'CWORD -= 2'
+	            WORDS=( ${WORDS[@]:2} )
+	            
+	            "${plugin}_completion"
+	            
 	            exit 0
 	        fi
+	        
 	        exit 1
 	    ;;
 		h|help)
@@ -103,6 +130,7 @@ do
 		:)
 			error_msg=$OPTLERR
 			call_usage=true
+			
 			break
 		;;
 	esac
@@ -110,6 +138,7 @@ done
 
 if $call_usage; then
 	core_help
+	
 	exit 1
 fi
 

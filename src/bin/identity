@@ -141,7 +141,7 @@ _identity_create_identifier() {
 		name=$input
 	fi
 	
-	if [[ " $(vnode_identity_list) " =~ " $name " ]]; then
+	if vnode_identity_exists $name; then
         echo "A identity with name '$name' already exists."
         read -n 1 -p "Do you want overwrite it? (y/N): " choice && choice=${choice:-N}
         echo ''

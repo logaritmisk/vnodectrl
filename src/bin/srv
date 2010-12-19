@@ -25,7 +25,11 @@ srv_help() {
 #
 # @author Anders Olsson
 srv_completion() {
-    echo "host guest unison"
+    if [ $CWORD -eq 0 ]; then
+        echo "host guest unison"
+    fi
+    
+    return 0
 }
 
 # Implementation of hook_exec

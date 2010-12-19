@@ -1,0 +1,59 @@
+#!/bin/bash
+
+
+# Main functions for plugin srv.
+#
+# api_version=1
+
+
+# Implementation of hook_info
+#
+# @author Anders Olsson
+ssh_info() {
+    echo "Control MySQL on guest system"
+}
+
+# Implementation of hook_info
+#
+# @author Anders Olsson
+ssh_help() {
+    echo "You can start cli, dump and restore"
+}
+
+# Implementation of hook_exec
+#
+# @author Anders Olsson
+ssh_exec() {
+    case $1 in
+    	cli)
+    		ssh_guest_cli
+    	;;
+    	*)
+    		ssh_help
+    		return 1
+    	;;
+    esac
+
+
+    return $?
+}
+
+
+
+# API for ssh
+
+
+# Start SSH session to guest.
+#
+# @author Anders Olsson
+ssh_guest_cli() {
+    local \
+        guest_user=$(vnode_identity_get 'guest_user') \
+        guest_addr=$(vnode_identity_get 'guest_addr')
+
+
+    ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr
+
+
+    return $?
+}

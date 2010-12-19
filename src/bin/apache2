@@ -16,18 +16,21 @@ apache2_info() {
 # Implementation of hook_completion
 #
 # @author Anders Olsson
-apache2_completion() {
-    echo "start stop reload restart"
+apache2_completion() {   
+    if [ $CWORD -eq 0 ]; then
+        echo "start stop reload restart"
+    fi
+
+    return 0
 }
 
 # Implementation of hook_exec
 #
 # @author Anders Olsson
 apache2_exec() {
-    local \
-        guest_user=$(vnode_identity_get 'guest_user') \
-        guest_pass=$(vnode_identity_get 'guest_pass') \
-        guest_addr=$(vnode_identity_get 'guest_addr')
+    local guest_user=$(vnode_identity_get 'guest_user')
+    local guest_pass=$(vnode_identity_get 'guest_pass')
+    local guest_addr=$(vnode_identity_get 'guest_addr')
 
 
     ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -k; echo $guest_pass | sudo -S /etc/init.d/apache2 $1" | tail -n +1
