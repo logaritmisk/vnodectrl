@@ -48,6 +48,7 @@ sql_exec() {
     	;;
     	*)
     		sql_help
+    		
     		return 1
     	;;
     esac

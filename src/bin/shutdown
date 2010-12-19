@@ -28,6 +28,15 @@ shutdown_exec() {
         
         return 1
     fi
+    
+
+    if vnode_try 1 "mount_is_mounted"; then
+        echo "Guest system is mounted, please unmount using 'vnodectrl umount'"
+        echo "and try again."
+        echo ""
+        
+        return 1
+    fi
 
 
     echo         "This will shutdown the server."

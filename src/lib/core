@@ -189,6 +189,10 @@ vnode_identity_set() {
 #
 # @input host_address
 host_is_online() {
+    if [ ! $# -eq 1 ]; then
+        return 1
+    fi
+    
     if ! ping -c 1 -W 5 $1 > /dev/null; then
     	return 1
     fi
@@ -199,6 +203,24 @@ host_is_online() {
 
 
 # ---------- vnode ----------
+
+vnode_try() {
+    if [ $# -le 3 ]; then
+        return ${1:-1}
+    fi
+    
+    if type -t "$2" > /dev/null; then
+        call=$2
+        
+        shift 2
+        
+        $call $@
+        
+        return $?
+    fi
+    
+    return $1
+}
 
 # Check if local user is root
 #

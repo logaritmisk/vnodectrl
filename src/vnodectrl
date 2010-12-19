@@ -112,7 +112,7 @@ do
             else
 	            plugin=${WORDS[1]:-core}
 	        fi
-
+            
 	        if type -t "${plugin}_completion" > /dev/null; then
 	            let 'CWORD -= 2'
 	            WORDS=( ${WORDS[@]:2} )
