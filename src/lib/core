@@ -36,7 +36,7 @@ vnode_variable_set() {
         return 1
     fi
     
-    sed -i"" "/^$2=.*$/d" $1 > /dev/null
+    sed "/^$2=.*$/d" "$1" > /tmp/a && mv /tmp/a "$1"
     
     if [ -n "$3" ]; then
         echo "$2=$3" | tee -a $1 > /dev/null
