@@ -35,8 +35,8 @@ usage: $VNODECTRL_BASENAME [options] command
 
 
 Options:
-  -h	  		          Show this message
-  -i identifier           Specifies identifier
+  -h                              Show this message
+  -i identifier                   Specifies identifier
 
 
 Commands:
@@ -82,8 +82,7 @@ done
 
 error_msg=''
 call_usage=false
-
-vnode_identity_unload
+loaded_identity=false
 
 if [ $# -eq 0 ]; then
 	set -- "-h"
@@ -97,6 +96,7 @@ do
 	case "$opt" in
 	    i)
 	        vnode_identity_load ${OPTLARG}
+	        loaded_identity=true
 	    ;;
 	    completion)
     	    shift "$(($OPTLIND - 1))"
@@ -140,6 +140,20 @@ if $call_usage; then
 	core_help
 	
 	exit 1
+fi
+
+if [ -z "$(identity_list)" ]; then
+    echo         "You don't have any identity files."
+    read -n 1 -p "Do you want to create one? (Y/n): " choice && choice=${choice:-N}
+    echo         ""
+
+    if [[ $choice == [yY] ]]; then
+        _identity_create_identifier
+    fi
+fi
+
+if ! loaded_identity; then
+    vnode_identity_unload
 fi
 
 shift "$(($OPTLIND - 1))"

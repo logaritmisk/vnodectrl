@@ -83,15 +83,77 @@ identity_exec() {
 
 
 
+# API for mount
+
+# List all existing identifiers
+#
+# @author Anders Olsson
+identity_list() {
+    local f identifiers
+    
+    if [ ! -d $VNODECTRL_IDENTIFIERS ]; then
+        mkdir -p $VNODECTRL_IDENTIFIERS
+    fi
+    
+    for f in $(find $VNODECTRL_IDENTIFIERS/ -iname "*.conf" -exec basename {} \;); do
+        identifiers[${#identifiers[@]}]=${f%%.*}
+    done
+    
+    echo ${identifiers[@]}
+}
+
+# Check if identity exist
+#
+# @input identity
+identity_exists() {
+    if [ ! $# -eq 1 ]; then
+        return 1
+    fi
+    
+    if [[ ! " $(identity_list) " =~ " $1 " ]]; then
+        return 1
+    fi
+    
+    return 0
+}
+
+# Set default identity
+#
+# @input identity
+identity_set_default() {
+    if ! identity_exists "$1"; then
+        return 1
+    fi
+    
+    vnode_config_set "default_identifier" "$1"
+    
+    return $?
+}
+
+# Set default identity
+identity_get_default() {
+    local identity=$(vnode_config_get "default_identifier" "")
+    
+    echo $identity
+    
+    if [ -z "$identity" ]; then
+        return 1
+    fi
+    
+    return 0
+}
+
+
+
 # Private functions
 
 
 _identity_list_identifiers() {
-	local default=$(vnode_config_get "default_identifier") info
+	local default=$(identity_get_default) info
 	
 	echo "Identifier(s):"
 	
-	for i in $(vnode_identity_list); do
+	for i in $(identity_list); do
 	    info=''
 		if [ "$default" == "$i" ]; then
 			info='(default)'
@@ -100,16 +162,16 @@ _identity_list_identifiers() {
 		printf "  %s %s\n" $i $info
 	done
 	
-	echo
+	echo ""
 	
 	return 0
 }
 
 _identity_default_identifier() {
 	if [ -z $1 ]; then
-		local default=$(vnode_config_get "default_identifier")
+		local default=$(identity_get_default)
 		
-		if [ -z $default ]; then
+		if [ -z "$default" ]; then
 			echo "There is no default identifier."
 			
 			return 1
@@ -117,13 +179,13 @@ _identity_default_identifier() {
 		
 		echo "$default"
 	else
-    	if [[ ! " $(vnode_identity_list) " =~ " $1 " ]]; then
+    	if ! identity_exists $1; then
     	    echo "Invalid identifier"
     	    
     	    return 1
     	fi
 		
-		vnode_config_set "default_identifier" "$1"
+		identity_set_default "$1"
 		
 		echo "Config '$1' is now set as default."
 	fi
@@ -141,7 +203,7 @@ _identity_create_identifier() {
 		name=$input
 	fi
 	
-	if vnode_identity_exists $name; then
+	if identity_exists $name; then
         echo "A identity with name '$name' already exists."
         read -n 1 -p "Do you want overwrite it? (y/N): " choice && choice=${choice:-N}
         echo ''
@@ -156,6 +218,7 @@ _identity_create_identifier() {
 	if [ ! -f $path ]; then
 	    touch $path
 	fi
+	
 	
 	while [ ! -d $input ]; do
 		read -e -p "Local SRV folder: " input && eval input=$input
@@ -182,4 +245,24 @@ _identity_create_identifier() {
 	
 	read -p "Guest address: " input
 	vnode_variable_set $path "guest_addr" ${input}
+	
+	
+	local identities=$(identity_list)
+	
+	if [ -z "$identites" ]; then
+	    echo         ""
+        echo         "This is your only identity file."
+        read -n 1 -p "Do you want to set it as your default? (Y/n): " choice && choice=${choice:-N}
+        echo         ""
+
+        if [[ $choice == [yY] ]]; then
+        	return 0
+        fi
+        
+	    identity_set_default "$name"
+	fi
+	
+	echo ""
+	
+	return 0
 }
