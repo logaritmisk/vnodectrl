@@ -27,7 +27,7 @@ mount_exec() {
     fi
 
 
-    mount_mount_sshfs
+    mount_mount_nfs
 
 
     return $?

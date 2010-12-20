@@ -204,6 +204,12 @@ host_is_online() {
 
 # ---------- vnode ----------
 
+# Try to call function
+#
+# @author Anders Olsson
+#
+# @input return_value
+# @input call_function
 vnode_try() {
     if [ $# -le 3 ]; then
         return ${1:-1}
