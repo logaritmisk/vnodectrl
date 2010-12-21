@@ -142,15 +142,15 @@ if $call_usage; then
 	exit 1
 fi
 
-if [ -z "$(identity_list)" ]; then
-    echo         "You don't have any identity files."
-    read -n 1 -p "Do you want to create one? (Y/n): " choice && choice=${choice:-N}
-    echo         ""
-
-    if [[ $choice == [yY] ]]; then
-        _identity_create_identifier
-    fi
-fi
+#if [ -z "$(identity_list)" ]; then
+#    echo         "You don't have any identity files."
+#    read -n 1 -p "Do you want to create one? (Y/n): " choice && choice=${choice:-N}
+#    echo         ""
+#
+#    if [[ $choice == [yY] ]]; then
+#        _identity_create_identifier
+#    fi
+#fi
 
 if ! $loaded_identity; then
     vnode_identity_unload
