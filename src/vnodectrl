@@ -152,7 +152,7 @@ if [ -z "$(identity_list)" ]; then
     fi
 fi
 
-if ! loaded_identity; then
+if ! $loaded_identity; then
     vnode_identity_unload
 fi
 
