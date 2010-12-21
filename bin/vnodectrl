@@ -54,12 +54,12 @@ _vnodectrl_update_core() {
     cd $VNODECTRL_ROOT
     
     if [ -d .git ]; then
-        $git_checkout
+        eval $git_checkout
     else
-        $git_init
+        eval $git_init
     fi
     
-    $git_update
+    eval $git_update
     
     
     return 0
