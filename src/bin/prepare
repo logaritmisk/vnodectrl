@@ -48,7 +48,7 @@ prepare_exec() {
     ssh-keygen -R $guest_addr > /dev/null 2>&1
     
     #Copy host ssh key to guest.
-    ssh -q -oStrictHostKeyChecking=no $guest_user@$guest_addr "mkdir ~/.ssh > /dev/null 2>&1; echo "`cat ~/.ssh/id_dsa.pub`" >> ~/.ssh/authorized_keys"
+    ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "mkdir ~/.ssh > /dev/null 2>&1; echo "`cat ~/.ssh/id_dsa.pub`" >> ~/.ssh/authorized_keys"
     
     if [ ! $? -eq 0 ]; then
     	echo "Faild to authorize host ($guest_user@$guest_addr)"
@@ -56,7 +56,7 @@ prepare_exec() {
     fi
     
     # Check if guest has been prepared.
-    ssh -q -oStrictHostKeyChecking=no $guest_user@$guest_addr "test -f ~/.vnodectrl.d/ssh/id_dsa.pub"
+    ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "test -f ~/.vnodectrl.d/ssh/id_dsa.pub"
     
     local R=$?
     
@@ -79,7 +79,7 @@ prepare_exec() {
     			return 1
     		fi
     		
-    		ssh -q -oStrictHostKeyChecking=no $guest_user@$guest_addr "~/guest/prepare.sh '$guest_pass'"
+    		ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "~/guest/prepare.sh '$guest_pass'"
     		
     		if [ ! $? == '0' ]; then
     			echo "Faild to prepare guest. (SSH)"

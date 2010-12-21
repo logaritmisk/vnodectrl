@@ -34,5 +34,5 @@ function sqlinit_init_database() {
     $grant_query .= ' IDENTIFIED BY \'' . $url['password'] . '\''; 
   }
   mysql_query($grant_query);
-  drush_log(dt("Database and user created for project", NULL, 'success');
+  drush_log(dt("Database and user created for project", NULL, 'success'));
 }

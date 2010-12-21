@@ -122,18 +122,21 @@ srv_sync_unison() {
         srv_folder=$(vnode_identity_get 'srv_folder')
 
 
+    echo "Prepareing files for unison..."
     rsync -azrPq --delete $srv_folder/ $guest_user@$guest_addr:/bak
 
     if [ ! $? -eq 0 ]; then
     	return 1
     fi
 
+    echo "Running unison"
     ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "unison -auto /bak /srv"
 
     if [ ! $? -eq 0 ]; then
     	return 1
     fi
 
+    echo "Updateing files..."
     rsync -azrPq --delete $guest_user@$guest_addr:/bak/ $srv_folder
 
     return $?
