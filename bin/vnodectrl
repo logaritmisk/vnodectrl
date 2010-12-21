@@ -6,17 +6,85 @@
 
 
 readonly VNODECTRL_VERSION="10.12-dev-alpha1"
-#readonly VNODECTRL_BASENAME=`basename $0`
+readonly VNODECTRL_BASENAME=`basename $0`
 
-#readonly VNODECTRL_ROOT="/opt/vnodectrl.d"
+readonly VNODECTRL_ROOT="/usr/vnodectrl"
 #readonly VNODECTRL_LOCAL="$HOME/.vnodectrl.d"
 
-#readonly VNODECTRL_BIN="$VNODECTRL_ROOT/bin"
-#readonly VNODECTRL_LIB="$VNODECTRL_ROOT/lib"
+#readonly VNODECTRL_BIN="${VNODECTRL_ROOT}/bin"
+#readonly VNODECTRL_LIB="${VNODECTRL_ROOT}/lib"
 
 #readonly VNODECTRL_CONFIG="$VNODECTRL_LOCAL/config"
 #readonly VNODECTRL_IDENTIFIERS="$VNODECTRL_LOCAL/identifier"
 
+readonly VNODECTRL_REPOSITORY_URL="https://Logaritmisk@github.com/Logaritmisk/vnodectrl.git"
+readonly VNODECTRL_REPOSITORY_BRANCH="2.x-dev"
+
 
 #. $VNODECTRL_LIB/core
-#. $VNODECTRL_LIB/getopts_long
+
+
+vnodectrl_help() {
+    cat << EOF
+usage: vnodectrl [-h|--help] COMMAND
+
+
+Commands:
+  update                              Update vnodectrl
+
+EOF
+
+    return 0
+}
+
+
+_vnodectrl_update_core() {
+    local git_init="git init"
+    local git_checkout="git checkout -q ${VNODECTRL_REPOSITORY_BRANCH}"
+    local git_update="git pull ${VNODECTRL_REPOSITORY_URL} ${VNODECTRL_REPOSITORY_BRANCH}"
+    
+    
+    if ! `which git`; then
+        echo "You have to install git to update vnodectrl"
+        
+        return 1
+    fi
+    
+    
+    cd $VNODECTRL_ROOT
+    
+    if [ -d .git ]; then
+        $git_checkout
+    else
+        $git_init
+    fi
+    
+    $git_update
+    
+    
+    return 0
+}
+
+
+while [ -n "$1" ]; do
+    case "$1" in
+        -h|--help)
+            vnodectrl_help
+            
+            exit 1
+        ;;
+        up|update)
+            _vnodectrl_update_core
+            
+            exit $?
+        ;;
+    esac
+    
+    shift
+done
+
+
+vnodectrl_help
+
+
+exit 1
