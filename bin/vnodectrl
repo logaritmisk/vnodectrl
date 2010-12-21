@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Control a virtual server.
+#
+# @author Anders Olsson <anders@nodeone.se>
+
+
+readonly VNODECTRL_VERSION="10.12-dev-alpha1"
+#readonly VNODECTRL_BASENAME=`basename $0`
+
+#readonly VNODECTRL_ROOT="/opt/vnodectrl.d"
+#readonly VNODECTRL_LOCAL="$HOME/.vnodectrl.d"
+
+#readonly VNODECTRL_BIN="$VNODECTRL_ROOT/bin"
+#readonly VNODECTRL_LIB="$VNODECTRL_ROOT/lib"
+
+#readonly VNODECTRL_CONFIG="$VNODECTRL_LOCAL/config"
+#readonly VNODECTRL_IDENTIFIERS="$VNODECTRL_LOCAL/identifier"
+
+
+#. $VNODECTRL_LIB/core
+#. $VNODECTRL_LIB/getopts_long
