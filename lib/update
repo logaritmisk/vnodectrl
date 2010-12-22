@@ -1,0 +1,28 @@
+#!/bin/bash
+
+
+_vnodectrl_update_core() {
+    local git_init="git init"
+    local git_checkout="git checkout -q ${VNODECTRL_REPOSITORY_BRANCH}"
+    local git_update="git pull ${VNODECTRL_REPOSITORY_URL} ${VNODECTRL_REPOSITORY_BRANCH}"
+    
+    
+    if ! `which git > /dev/null`; then
+        echo "You have to install git to update vnodectrl"
+        
+        return 1
+    fi
+        
+    cd $VNODECTRL_ROOT
+    
+    if [ -d .git ]; then
+        eval $git_checkout
+    else
+        eval $git_init
+    fi
+    
+    eval $git_update
+    
+    
+    return 0
+}
