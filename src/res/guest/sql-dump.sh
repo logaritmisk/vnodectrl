@@ -15,7 +15,7 @@ echo "Dumping databases..."
 
 # Backing up local database
 for DATABASE in $(mysql -u root -e "SHOW DATABASES;" --xml | egrep -o 'Database\">(.*?)<' | sed -e "s/^Database\">//" -e "s/<$//"); do
-	BACKUP_NAME=$DATABASE.`date +%Y%m%d_%H.%M.%S`.sql.gz
+	BACKUP_NAME=$DATABASE.`date +%Y%m%d_%H%M%S`.sql.gz
 	
 	echo " * dumping '$DATABASE' to '$BACKUP_DIR/$BACKUP_NAME'"
 	
