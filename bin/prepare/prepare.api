@@ -1,0 +1,50 @@
+#!/bin/bash
+
+
+# Authorize host on guest system
+#
+# @author Anders Olsson
+prepare_authorize_host() {
+    local USER_ADDR=$(identity_get 'user_addr')
+    
+    local id_dsa
+    
+    
+    if [ ! -f "$HOME/.ssh/id_dsa.pub" ]; then
+        echo "Generate a public ssh key of type dsa and try again."
+        
+        return 1
+    fi
+    
+    id_dsa=$(cat ~/.ssh/id_dsa.pub)
+    
+    # remove guest from known_hosts
+    ssh-keygen -R $USER_ADDR > /dev/null 2>&1
+    
+    # copy host ssh key to guest
+    ssh_remote_exec "mkdir ~/.ssh > /dev/null 2>&1; echo \"${id_dsa}\" >> ~/.ssh/authorized_keys"
+    
+    return $?
+}
+
+# Authorize guest on host system
+#
+# @author Anders Olsson
+prepare_authorize_guest() {
+    local SSH_KEY=$(ssh_remote_exec "cat ~/.vnodectrl.d/ssh/id_dsa.pub")
+    
+    echo $SSH_KEY | tee -a ~/.ssh/authorized_keys > /dev/null
+    
+    uniq ~/.ssh/authorized_keys ~/.ssh/authorized_keys.old && mv ~/.ssh/authorized_keys.old ~/.ssh/authorized_keys
+    
+    return 1
+}
+
+# Check if guest has been prepared
+#
+# @author Anders Olsson
+prepare_is_prepared() {
+    ssh_remote_exec "test -f ~/.vnodectrl.d/ssh/id_dsa.pub"
+    
+    return $?
+}

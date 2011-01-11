@@ -123,7 +123,7 @@ _identity_default_choose() {
         echo         "No identities could be found."
         read -en1 -p "Do you want to create one? (Y/n) " input
         
-        if [[ "${input}" =~ ^[Yy]$ ]]; then
+        if [[ "${input-'Y'}" =~ ^[Yy]$ ]]; then
             identity_create
         else
             exit 0
@@ -132,7 +132,7 @@ _identity_default_choose() {
         echo         "There is no default identity."
         read -en1 -p "Do you want to use '${IDENTITIES[0]}' as default? (Y/n) " input
         
-        if [[ "${input}" =~ ^[Yy]$ ]]; then
+        if [[ "${input-'Y'}" =~ ^[Yy]$ ]]; then
             config_set "identity_default" "${IDENTITIES[0]}"
         else
             exit 0

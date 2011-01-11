@@ -22,11 +22,13 @@ plugin_is_enabled() {
 }
 
 plugin_path() {
-    local item PLUGIN=${1?'Error: missing parameter'} TYPE=${2-'INC'}
+    local item path PLUGIN=${1?'Error: missing parameter'} FULL_PATH=${2-false}
     
+    
+    [ $FULL_PATH ] && path="${VNODECTRL_PATH_BIN}/"
     
     for item in ${VNODECTRL_PLUGIN_INC_LOADED[@]}; do
-        [ "${PLUGIN}" == "${item%%:*}" ] && { echo ${item##*:}; return 0; }
+        [ "${PLUGIN}" == "${item%%:*}" ] && { echo "${path}${item##*:}"; return 0; }
     done
     
     return 1

@@ -1,8 +1,21 @@
 #!/bin/bash
 
-# @docstring API for SSH plugin
 
-
+# Execute command on guest with ssh
+#
+# @author Anders Olsson
 ssh_remote_exec() {
-    return 0
+    local command=${1?'Error: missing parameter'}
+    
+    local GUEST_USER=$(identity_get "guest_user")
+    local GUEST_PASS=$(identity_get "guest_pass")
+    local GUEST_ADDR=$(identity_get "guest_addr")
+    
+    
+    # %sudo% => sudo -k; echo $GUEST_PASS | sudo -S
+    command=$(echo $command | sed -E 's/%sudo%[ \t]+(.*)/sudo -k; echo '"${GUEST_PASS}"' | sudo -S \1 | tail -n +1/g')
+    
+    ssh -qt -oStrictHostKeyChecking=no $OPT $GUEST_USER@$GUEST_ADDR "${command}"
+    
+    return $?
 }

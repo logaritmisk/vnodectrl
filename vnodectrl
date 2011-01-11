@@ -41,6 +41,7 @@ _core_help_print_commands() {
 }
 
 
+. $VNODECTRL_PATH_LIB/getopts_long.sh
 . $VNODECTRL_PATH_LIB/loader.sh
 
 loader_addpath "${VNODECTRL_PATH_ROOT}"
@@ -56,8 +57,8 @@ include "lib/identity.sh"
 
 _vnodectrl_config_init
 
-_vnodectrl_plugin_api_load "$VNODECTRL_PATH_BIN"
-_vnodectrl_plugin_inc_load "$VNODECTRL_PATH_BIN"
+_vnodectrl_plugin_api_load "${VNODECTRL_PATH_BIN}"
+_vnodectrl_plugin_inc_load "${VNODECTRL_PATH_BIN}"
 
 _vnodectrl_identity_init
 
@@ -68,14 +69,14 @@ while [ -n "$1" ]; do
     case "$1" in
         -h|--help)
             core_help
-
+            
             exit 1
         ;;
         -c|--create)
             shift
-
+            
             identity_create "$@"
-
+            
             exit 0
         ;;
     esac
@@ -85,13 +86,13 @@ while [ -n "$1" ]; do
         
         shift
         
-        dispatch 'exec_pre' $plugin "$@"
+        # dispatch 'exec_pre' $plugin "$@"
         
         ${plugin}_exec "$@"
         
         R=$?
         
-        dispatch 'exec_post' $plugin "$@"
+        # dispatch 'exec_post' $plugin "$@"
         
         exit $R
     fi

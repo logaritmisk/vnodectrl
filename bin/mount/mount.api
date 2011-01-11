@@ -28,6 +28,18 @@ mount_mount_sshfs() {
     return $?
 }
 
+# Umount
+#
+# @author Anders Olsson
+mount_umount() {
+    local SRV_FOLDER=$(identity_get 'srv_folder')
+    
+    
+    sudo umount $SRV_FOLDER
+    
+    return $?
+}
+
 # Check if guest is mounted.
 #
 # @author Anders Olsson
