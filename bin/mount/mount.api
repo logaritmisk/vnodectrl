@@ -1,0 +1,43 @@
+#!/bin/bash
+
+
+# Mount using nfs
+#
+# @author Anders Olsson
+mount_mount_nfs() {
+    local GUEST_ADDR=$(identity_get 'guest_addr')
+    local SRV_FOLDER=$(identity_get 'srv_folder')
+    
+    
+    sudo mount -oactimeo=3 $GUEST_ADDR:/srv $SRV_FOLDER
+    
+    return $?
+}
+
+# Mount using sshfs
+#
+# @author Anders Olsson
+mount_mount_sshfs() {
+    local GUEST_USER=$(identity_get 'guest_user')
+    local GUEST_ADDR=$(identity_get 'guest_addr')
+    local SRV_FOLDER=$(identity_get 'srv_folder')
+    
+    
+    sudo sshfs $GUEST_USER@$GUEST_ADDR:/srv $SRV_FOLDER
+    
+    return $?
+}
+
+# Check if guest is mounted.
+#
+# @author Anders Olsson
+mount_is_mounted() {
+    local GUEST_ADDR=$(identity_get 'guest_addr')
+    
+    
+    if mount | egrep "^$(echo $GUEST_ADDR | sed 's/\./\\\./g'):/srv on.*$" > /dev/null; then
+        return 0
+    fi
+    
+    return 1
+}

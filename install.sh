@@ -9,4 +9,4 @@ readonly APP_FOLDER=/usr/vnodectrl
 
 /bin/bash -o pipefail -c "/usr/bin/curl -sSfL https://github.com/Logaritmisk/vnodectrl/tarball/2.x-dev | sudo /usr/bin/tar xvz -C$APP_FOLDER --strip 1"
 
-/usr/bin/sudo /bin/ln -sf $APP_FOLDER/bin/vnodectrl /usr/bin/vnodectrl
+/usr/bin/sudo /bin/ln -sf $APP_FOLDER/vnodectrl /usr/bin/vnodectrl

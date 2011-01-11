@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# @docstring API for SSH plugin
+
+
+ssh_remote_exec() {
+    return 0
+}
