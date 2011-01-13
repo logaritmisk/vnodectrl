@@ -4,7 +4,7 @@
 # @author Anders Olsson (logaritmisk)
 
 
-BACKUP_DIR=/srv/mysql
+readonly BACKUP_DIR=/srv/mysql
 
 
 # Remove old backup files
