@@ -122,7 +122,7 @@ srv_sync_unison() {
         srv_folder=$(vnode_identity_get 'srv_folder')
 
 
-    echo "Prepareing files for unison..."
+    echo "Preparing files for unison..."
     rsync -azrPq --delete $srv_folder/ $guest_user@$guest_addr:/bak
 
     if [ ! $? -eq 0 ]; then
@@ -136,7 +136,7 @@ srv_sync_unison() {
     	return 1
     fi
 
-    echo "Updateing files..."
+    echo "Updating files..."
     rsync -azrPq --delete $guest_user@$guest_addr:/bak/ $srv_folder
 
     return $?
