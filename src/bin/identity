@@ -252,10 +252,10 @@ _identity_create_identifier() {
 	if [ -z "$identites" ]; then
 	    echo         ""
         echo         "This is your only identity file."
-        read -n 1 -p "Do you want to set it as your default? (Y/n): " choice && choice=${choice:-N}
+        read -en1 -p "Do you want to set it as your default? (Y/n): " choice
         echo         ""
 
-        if [[ $choice == [yY] ]]; then
+        if [[ "${choice-N}" == ^[yY]$ ]]; then
         	return 0
         fi
         
