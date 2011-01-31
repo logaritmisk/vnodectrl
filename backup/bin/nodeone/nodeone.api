@@ -1,0 +1,12 @@
+#!/bin/bash
+
+
+nodeone_prepare() {
+    local PLUGIN_PATH=$(plugin_path 'nodeone.api')
+    
+    
+    guest_scp $PLUGIN_PATH/srv/prepare_server.sh ~/
+    guest_exec $PLUGIN_PATH/srv/prepare_server.sh
+    
+    guest_prepare $PLUGIN_PATH/srv/prepare_server.sh
+}

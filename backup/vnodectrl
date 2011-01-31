@@ -1,0 +1,127 @@
+#!/bin/bash
+
+# Control a virtual server.
+#
+# @author Anders Olsson <anders@nodeone.se>
+
+
+readonly VNODECTRL_VERSION="10.12-dev-alpha1"
+readonly VNODECTRL_BASENAME=`basename $0`
+
+readonly VNODECTRL_PATH_ROOT="/Users/olsson/Workspace/devtools/vnodectrl"
+#readonly VNODECTRL_PATH_ROOT="/usr/vnodectrl"
+readonly VNODECTRL_PATH_USER="$HOME/.vnodectrl.d"
+
+readonly VNODECTRL_PATH_LIB="${VNODECTRL_PATH_ROOT}/lib"
+readonly VNODECTRL_PATH_BIN="${VNODECTRL_PATH_ROOT}/bin"
+
+readonly VNODECTRL_REPOSITORY_URL="https://Logaritmisk@github.com/Logaritmisk/vnodectrl.git"
+readonly VNODECTRL_REPOSITORY_BRANCH="2.x-dev"
+
+
+core_help() {
+    cat << EOF
+usage: vnodectrl [-h|--help] [-c [identity]] COMMAND
+
+
+$(_core_help_print_commands)
+
+EOF
+
+    return 0
+}
+
+_core_help_print_commands() {
+    local plugin attr i=0 hash entries PLUGINS=( $(echo -e $(plugins_loaded | sed 's/ /\\n/g') | sort -u) )
+    
+    
+    for plugin in ${PLUGINS[@]}; do
+        attr=$(plugin_attr $plugin 'package')
+        
+        [ -z "${attr}" ] && attr='Other'
+        
+        if [[ ! "${hash}" =~ "%${attr}:" ]]; then
+            hash="${hash}%${attr}:${i}%"
+        else
+            hash=$(echo "$hash" | sed -E 's/(%'"${attr}"':[0-9,]*)%/\1,'"${i}"'%/')
+        fi
+        
+        ((i++))
+    done
+    
+    while read f; do
+        echo "${f}:";
+        
+        for i in $(echo $hash | grep -oE ''"${f}"':[0-9,]*' | sed -E 's/^'"${f}"'://;s/,/ /g'); do
+            printf "  %-30s%s\n" ${PLUGINS[$i]} "$(plugin_attr ${PLUGINS[$i]} 'description')"
+        done
+        
+        echo -ne '\n\n'
+    done < <(echo -e $(echo $hash | sed -E 's/%%/\\n/g;s/%//g;s/([^:]*)[:0-9,]*/\1/g') | sort -u)
+}
+
+
+. $VNODECTRL_PATH_LIB/getopts_long.sh
+. $VNODECTRL_PATH_LIB/loader.sh
+
+loader_addpath "${VNODECTRL_PATH_ROOT}"
+
+
+include "lib/core.sh"
+include "lib/util.sh"
+
+include "lib/config.sh"
+include "lib/plugin.sh"
+include "lib/identity.sh"
+
+
+_vnodectrl_config_init
+
+_vnodectrl_plugin_api_load "${VNODECTRL_PATH_BIN}"
+_vnodectrl_plugin_inc_load "${VNODECTRL_PATH_BIN}"
+
+_vnodectrl_identity_init
+
+_vnodectrl_api_dispatch 'init'
+
+
+while [ -n "$1" ]; do
+    case "$1" in
+        -h|--help)
+            core_help
+            
+            exit 1
+        ;;
+        -c|--create)
+            shift
+            
+            identity_create "$@"
+            
+            exit 0
+        ;;
+    esac
+    
+    if plugin_is_enabled "${1}"; then
+        plugin=$1
+        
+        shift
+        
+        # dispatch 'exec_pre' $plugin "$@"
+        
+        ${plugin}_exec "$@"
+        
+        R=$?
+        
+        # dispatch 'exec_post' $plugin "$@"
+        
+        exit $R
+    fi
+    
+    shift
+done
+
+
+core_help
+
+
+exit 1

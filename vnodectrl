@@ -5,7 +5,7 @@
 # @author Anders Olsson <anders@nodeone.se>
 
 
-readonly VNODECTRL_VERSION="10.12-dev-alpha1"
+readonly VNODECTRL_VERSION="11.01-dev-alpha1"
 readonly VNODECTRL_BASENAME=`basename $0`
 
 readonly VNODECTRL_PATH_ROOT="/Users/olsson/Workspace/devtools/vnodectrl"
@@ -21,87 +21,55 @@ readonly VNODECTRL_REPOSITORY_BRANCH="2.x-dev"
 
 core_help() {
     cat << EOF
-usage: vnodectrl [-h|--help] [-c [identity]] COMMAND
+usage: vnodectrl [-h|--help] COMMAND
 
 
 Commands:
-$(_core_help_print_commands)
 
 EOF
 
     return 0
 }
 
-_core_help_print_commands() {
-    local plugin
-    
-    for plugin in $(plugins_loaded); do
-        printf "  %-30s%s\n" $plugin "$(plugin_attr $plugin 'docstring')"
-    done
-}
 
-
-. $VNODECTRL_PATH_LIB/getopts_long.sh
-. $VNODECTRL_PATH_LIB/loader.sh
+. "${VNODECTRL_PATH_LIB}/vendor/getopts_long.sh"
+. "${VNODECTRL_PATH_LIB}/vendor/loader.sh"
 
 loader_addpath "${VNODECTRL_PATH_ROOT}"
 
-
-include "lib/core.sh"
-include "lib/util.sh"
-
 include "lib/config.sh"
-include "lib/plugin.sh"
-include "lib/identity.sh"
+include "lib/alias.sh"
+include "lib/module.sh"
 
 
-_vnodectrl_config_init
-
-_vnodectrl_plugin_api_load "${VNODECTRL_PATH_BIN}"
-_vnodectrl_plugin_inc_load "${VNODECTRL_PATH_BIN}"
-
-_vnodectrl_identity_init
-
-_vnodectrl_api_dispatch 'init'
-
-
-while [ -n "$1" ]; do
-    case "$1" in
-        -h|--help)
-            core_help
-            
-            exit 1
-        ;;
-        -c|--create)
-            shift
-            
-            identity_create "$@"
-            
-            exit 0
-        ;;
-    esac
+if [ -z "${1}" ]; then
+    core_help
     
-    if plugin_is_enabled "${1}"; then
-        plugin=$1
-        
-        shift
-        
-        # dispatch 'exec_pre' $plugin "$@"
-        
-        ${plugin}_exec "$@"
-        
-        R=$?
-        
-        # dispatch 'exec_post' $plugin "$@"
-        
-        exit $R
-    fi
+    exit 1
+fi
+
+if [ "${1:0:1}" == "@" ]; then
+    alias_use "${1:1}" && shift
+fi
     
-    shift
-done
-
-
-core_help
-
-
-exit 1
+case "$1" in
+    -h|--help)
+        core_help
+        
+        exit 1
+    ;;
+esac
+    
+if is_function "${1}_exec"; then
+    module="${1}" && shift
+        
+    # dispatch 'exec_pre' "${module}" "$@"
+        
+    "${module}_exec" "$@"
+        
+    R="${?}"
+        
+    # dispatch 'exec_post' "${module}" "$@"
+        
+    exit "${R}"
+fi

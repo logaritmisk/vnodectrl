@@ -1,33 +1,39 @@
 #!/bin/bash
 
 
-include "lib/util.sh"
+include "lib/variable.sh"
 
 
 readonly VNODECTRL_CONFIG_PATH="${VNODECTRL_PATH_USER}/config"
 
 
 
-# Public function
+# Public functions
 
 config_set() {
-    variable_set $VNODECTRL_CONFIG_PATH "$@"
+    variable_set "${VNODECTRL_CONFIG_PATH}" "$@"
     
-    return 0
+    return $?
 }
 
 config_get() {
-    variable_get $VNODECTRL_CONFIG_PATH "$@"
+    variable_get "${VNODECTRL_CONFIG_PATH}" "$@"
     
-    return 0
+    return $?
 }
 
 
 
-# Private function
+# Private functions
 
-_vnodectrl_config_init() {
-    if [ ! -f $VNODECTRL_CONFIG_PATH ]; then
-        touch $VNODECTRL_CONFIG_PATH
+vnodectrl_config_init() {
+    if [ ! -f "${VNODECTRL_CONFIG_PATH}" ]; then
+        touch "${VNODECTRL_CONFIG_PATH}"
     fi
 }
+
+
+
+# On init
+
+vnodectrl_config_init

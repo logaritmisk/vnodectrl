@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# @docstring Unmount guest system
+# @package Mount
+# @description Unmount guest system
 
 
 # Implementation of hook_exec

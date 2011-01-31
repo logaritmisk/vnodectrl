@@ -1,34 +1,52 @@
 #!/bin/bash
 
 # The first argument is sudo password for current user
-# @author Anders Olsson (logaritmisk)
+# @author Anders Olsson
 
-echo -n "has a id_dsa file been generated? "
-if [ ! -f ~/.vnodectrl.d/ssh/id_dsa ]; then
-    echo "no"
-    
-    mkdir -p ~/.vnodectrl.d/ssh > /dev/null
 
-    ssh-keygen -t dsa -N '' -f ~/.vnodectrl.d/ssh/id_dsa
-else
-    echo "yes"
-fi
+readonly PASSWORD=${1}
 
-# Bak folder used with unison
+
+prepare_ssh_key() {
+    echo -n "has a ssh key been generated? "
+    if [ ! -f ~/.vnodectrl.d/ssh/id_dsa ]; then
+        echo "no"
+        
+        echo -n "generating ssh key... "
+        
+        mkdir -p ~/.vnodectrl.d/ssh > /dev/null
+        
+        ssh-keygen -t dsa -N '' -f ~/.vnodectrl.d/ssh/id_dsa
+        
+        echo "done"
+    else
+        echo "yes"
+    fi
+}
+
+
+prepare_ssh_key
+
+
+exit 0
+
+
+
+# bak folder used with unison
 if [ ! -d /bak ]; then
     echo $1 | sudo -S mkdir -p /bak
 fi
 
 echo $1 | sudo -S chown -R $(whoami)\: /bak
 
-# Bak folder used with unison
+# srv folder
 if [ ! -d /srv ]; then
 	echo $1 | sudo -S mkdir -p /srv
 fi
 
 echo $1 | sudo -S chown -R $(whoami)\: /srv
 
-# Make sure we have a nice file structure
+# make sure we have a nice file structure
 if [ ! -d /srv/mysql ]; then
     mkdir -p /srv/mysql
 fi
@@ -49,14 +67,14 @@ if [ ! -d /srv/drush ]; then
 	mkdir -p /srv/drush
 fi
 
-# Move drushrc to /srv/drush
+# move drushrc to /srv/drush
 #mv ~/guest/drush/* /srv/drush
 
 #if [ ! -L $HOME/.drush ]; then
 #    ln -s /srv/drush $HOME/.drush
 #fi
 
-# Remove sites-enabled and use symlink to /srv/vhosts
+# remove sites-enabled and use symlink to /srv/vhosts
 if [ ! -L /etc/apache2/sites-enabled ]; then
     echo $1 | sudo -S rm -r /etc/apache2/sites-enabled
     echo $1 | sudo -S ln -s /srv/vhosts /etc/apache2/sites-enabled

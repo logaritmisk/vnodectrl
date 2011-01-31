@@ -46,6 +46,11 @@ prepare_exec() {
     	echo         ""
     	
     	if [[ "${choice-'Y'}" =~ ^[Yy]$ ]]; then
+    	    ssh_remote_exec "$(cat ${ROOT_PATH%/*}/src/server_prepare.sh | sed 's/%guest_pass%/$GUEST_PASS/g')"
+    	    
+    	    
+    	    
+    	    
     		scp "${ROOT_PATH%/*}/src/server_prepare.sh" $GUEST_USER@$GUEST_ADDR:~/ > /dev/null 2>&1
     		
     		if [ $? -ne 0 ]; then

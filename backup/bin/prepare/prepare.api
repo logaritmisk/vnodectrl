@@ -5,9 +5,11 @@
 #
 # @author Anders Olsson
 prepare_authorize_host() {
-    local USER_ADDR=$(identity_get 'user_addr')
+    local GUEST_USER=$(identity_get 'guest_user')
+    local GUEST_PASS=$(identity_get 'guest_pass')
+    local GUEST_ADDR=$(identity_get 'guest_addr')
     
-    local id_dsa
+    local id_dsa cmd
     
     
     if [ ! -f "$HOME/.ssh/id_dsa.pub" ]; then
@@ -16,14 +18,25 @@ prepare_authorize_host() {
         return 1
     fi
     
+    # get public id_dsa key
     id_dsa=$(cat ~/.ssh/id_dsa.pub)
     
     # remove guest from known_hosts
-    ssh-keygen -R $USER_ADDR > /dev/null 2>&1
+    ssh-keygen -R $GUEST_ADDR > /dev/null 2>&1
+    
+    # build command to run on server
+    cmd="mkdir ~/.ssh; echo '${id_dsa}' | tee -a ~/.ssh/authorized_keys; uniq ~/.ssh/authorized_keys ${$}.temp && mv ${$}.temp ~/.ssh/authorized_keys"
     
     # copy host ssh key to guest
-    ssh_remote_exec "mkdir ~/.ssh > /dev/null 2>&1; echo \"${id_dsa}\" >> ~/.ssh/authorized_keys"
-    
+    expect << EOF
+log_user 0
+spawn ssh -q -oStrictHostKeyChecking=no $GUEST_USER@$GUEST_ADDR "$cmd"
+expect "*?assword:*" {
+    send "$GUEST_PASS\r\r"
+    expect eof
+}
+EOF
+     
     return $?
 }
 
@@ -33,9 +46,10 @@ prepare_authorize_host() {
 prepare_authorize_guest() {
     local SSH_KEY=$(ssh_remote_exec "cat ~/.vnodectrl.d/ssh/id_dsa.pub")
     
+    
     echo $SSH_KEY | tee -a ~/.ssh/authorized_keys > /dev/null
     
-    uniq ~/.ssh/authorized_keys ~/.ssh/authorized_keys.old && mv ~/.ssh/authorized_keys.old ~/.ssh/authorized_keys
+    uniq ~/.ssh/authorized_keys $$.temp && mv $$.temp ~/.ssh/authorized_keys
     
     return 1
 }

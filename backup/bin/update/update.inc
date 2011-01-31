@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# @docstring Update vnodectrl
+# @package Core
+# @description Update vnodectrl
 
 
 update_exec() {

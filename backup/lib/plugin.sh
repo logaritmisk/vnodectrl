@@ -21,17 +21,32 @@ plugin_is_enabled() {
     return 1
 }
 
-plugin_path() {
-    local item path PLUGIN=${1?'Error: missing parameter'} FULL_PATH=${2-false}
+plugin_file() {
+    local item path type PLUGIN=${1?'Error: missing parameter'} FULL_PATH=${2-false}
     
     
-    [ $FULL_PATH ] && path="${VNODECTRL_PATH_BIN}/"
+    ( $FULL_PATH ) && path="${VNODECTRL_PATH_BIN}/"
+        
+    if [ "${PLUGIN%%*.}" = "api" ]; then
+        type="VNODECTRL_PLUGIN_API_LOADED"
+    else
+        type="VNODECTRL_PLUGIN_INC_LOADED"
+    fi
     
     for item in ${VNODECTRL_PLUGIN_INC_LOADED[@]}; do
         [ "${PLUGIN}" == "${item%%:*}" ] && { echo "${path}${item##*:}"; return 0; }
     done
     
     return 1
+}
+
+plugin_path() {
+    local PATH=$(plugin_file "$@")
+    
+    
+    echo ${PATH%/*}
+    
+    return 0
 }
 
 plugin_attr() {
@@ -42,7 +57,7 @@ plugin_attr() {
         return 0
     fi
     
-    attr=$(grep -Eoi "${REGEX}(.*?)" ${VNODECTRL_PATH_BIN}/$(plugin_path "${PLUGIN}") | sed "s/${REGEX}//")
+    attr=$(grep -Eoi "${REGEX}(.*?)" $(plugin_file "${PLUGIN}" true) | sed "s/${REGEX}//")
     
     if [ -z "$attr" ]; then
         echo ${3-''}

@@ -58,3 +58,10 @@ dispatch() {
     
     return 0
 }
+
+array_sort() {
+    local A=${1?'Error: missing paramter'} B=${2?'Error: missing parameter'} e i
+    
+    
+    while read e; do eval "$B"'[${#'"$B"'[@]}]=$e'; done < <(eval 'echo -e "$(for ((i=0; i < ${#'"$A"'[@]}; i++)); do echo ${'"$A"'[$i]}; done)" | sort')
+}

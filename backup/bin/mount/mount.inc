@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# @docstring Mount guest system
-
+# @package Mount
+# @description Mount guest system
 
 # Implementation of hook_exec
 #
