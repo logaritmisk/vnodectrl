@@ -65,7 +65,7 @@ _alias_list() {
 
 _alias_set_value() {
     local _KEY=$(_alias_sanitize "${1?'Error: missing parameter'}")
-    local _VALUE=$(_alias_sanitize "${2'Error: missing parameter'}")
+    local _VALUE=$(_alias_sanitize "${2?'Error: missing parameter'}")
 
     alias_set "${_KEY}" "${_VALUE}"
 

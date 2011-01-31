@@ -6,8 +6,10 @@
 
 apache2-init_exec() {
     if ! alias_loaded -s; then
-        return 1
+        return 2
     fi
+    
+    # require_alias false "guest.host" "guest.username" "guest.password"
     
     local _HOST=$(alias_get "guest.host")
     local _USERNAME=$(alias_get "guest.username")

@@ -33,7 +33,7 @@ _config_sanitize() {
 
 _config_set_value() {
     local _KEY=$(_config_sanitize "${1?'Error: missing parameter'}")
-    local _VALUE=$(_config_sanitize "${2'Error: missing parameter'}")
+    local _VALUE=$(_config_sanitize "${2?'Error: missing parameter'}")
 
     config_set "${_KEY}" "${_VALUE}"
 
