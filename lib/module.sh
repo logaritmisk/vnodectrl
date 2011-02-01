@@ -98,9 +98,11 @@ vnodectrl_module_load() {
     for item in $(find "${_PATH}" -type f -iname "*.m"); do
         item=${item##$_PATH/}
         
+        export MODULE_ROOT="bin/${item%/*}"
+        
         include "bin/${item}"
         
-        items[${#items[@]}]="`basename ${item%%.*}`:${item}"
+        items[${#items[@]}]="`basename ${item%%.*}`:bin/${item}"
     done
         
     VNODECTRL_MODULE_LOADED=( ${items[@]} )

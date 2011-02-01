@@ -38,7 +38,7 @@ alias_exec() {
 # Private functions
 
 _alias_sanitize() {
-    echo "${1?'Error: missing parameter'}" | sed -E 's/[^a-zA-Z0-9._-]//g'
+    echo "${1?'Error: missing parameter'}" | sed -E 's/[^a-zA-Z0-9\/._-]//g'
 }
 
 _alias_create() {
