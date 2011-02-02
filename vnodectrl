@@ -21,14 +21,26 @@ readonly VNODECTRL_REPOSITORY_BRANCH="2.x-dev"
 
 core_help() {
     cat << EOF
-usage: vnodectrl [-h|--help] COMMAND
+usage: vnodectrl [-h|--help] [ALIAS] COMMAND
 
 
 Commands:
+$(_core_list_commands)
+
 
 EOF
 
     return 0
+}
+
+_core_list_commands() {
+    local _M
+    
+    for _M in $(module_get_loaded); do
+        ! is_function "${_M}_exec" && continue
+        
+        printf "  %s\n" "${_M}"
+    done
 }
 
 
@@ -51,25 +63,30 @@ fi
 if [ "${1:0:1}" == "@" ]; then
     alias_use "${1:1}" && shift
 fi
-    
+
 case "$1" in
     -h|--help)
         core_help
         
         exit 1
     ;;
+    --update)
+        update_exec
+        
+        exit $?
+    ;;
 esac
-    
+
 if is_function "${1}_exec"; then
     module="${1}" && shift
-        
+    
     # dispatch 'exec_pre' "${module}" "$@"
-        
+    
     "${module}_exec" "$@"
-        
+    
     R="${?}"
-        
+    
     # dispatch 'exec_post' "${module}" "$@"
-        
+    
     exit "${R}"
 fi
