@@ -14,7 +14,7 @@ apache2-init_exec() {
     local _HOST=$(alias_get "guest.host")
     local _USERNAME=$(alias_get "guest.username")
     
-    ssh -qt $_USERNAME@$_HOST "/etc/init.d/apache2 ${1}"
+    ssh -qt $_USERNAME@$_HOST "sudo /etc/init.d/apache2 ${1}"
     
     return $?
 }
