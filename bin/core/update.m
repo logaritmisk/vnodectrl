@@ -11,19 +11,35 @@ update_exec() {
         return 1
     fi
     
-    local _GIT_INIT="git init"
-    local _GIT_CHECKOUT="git checkout -q ${VNODECTRL_REPOSITORY_BRANCH}"
-    local _GIT_UPDATE="git pull ${VNODECTRL_REPOSITORY_URL} ${VNODECTRL_REPOSITORY_BRANCH}"
-    
-    cd "${VNODECTRL_PATH_ROOT}"
-    
     if [ -d .git ]; then
-        eval "${_GIT_CHECKOUT}"
+        _update_git_init
     else
-        eval "${_GIT_INIT}"
+        _update_git_checkout
     fi
     
-    eval "${_GIT_UPDATE}"
+    _update_git_update
     
     return 0
+}
+
+
+
+# Private functions
+
+_update_git_init() {
+    local _GIT_INIT="sudo git init"
+    
+    cd "${VNODECTRL_PATH_ROOT}" && eval "${_GIT_INIT}"
+}
+
+_update_git_checkout() {
+    local _GIT_CHECKOUT="sudo git checkout -q ${VNODECTRL_REPOSITORY_BRANCH}"
+    
+    cd "${VNODECTRL_PATH_ROOT}" && eval "${_GIT_CHECKOUT}"
+}
+
+_update_git_update() {
+    local _GIT_UPDATE="sudo git pull ${VNODECTRL_REPOSITORY_URL} ${VNODECTRL_REPOSITORY_BRANCH}"
+    
+    cd "${VNODECTRL_PATH_ROOT}" && eval "${_GIT_UPDATE}"
 }

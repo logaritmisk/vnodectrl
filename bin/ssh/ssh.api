@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# @package LAMP
-# @description Control apache2
 
-
-apache2-init_exec() {
+ssh_remote_eval() {
     if ! alias_loaded -s; then
         return 2
     fi
@@ -12,7 +9,7 @@ apache2-init_exec() {
     local _HOST=$(alias_get "guest.host")
     local _USERNAME=$(alias_get "guest.username")
     
-    guest_eval "%sudo% /etc/init.d/apache2 ${1}"
+    ssh -qt $_USERNAME@$_HOST "$@"
     
     return $?
 }

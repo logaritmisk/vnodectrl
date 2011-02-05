@@ -32,7 +32,7 @@ _srv_mount_nfs() {
     local _GUEST_SRV_FOLDER=$(alias_get 'guest.srv_folder')
     local _HOST_SRV_FOLDER=$(alias_get 'host.srv_folder')
     
-    sudo mount_nfs -oactimeo=3 "${_GUEST_HOST}:${_GUEST_SRV_FOLDER}" "${_HOST_SRV_FOLDER}"
+    sudo mount_nfs -oactimeo=0 "${_GUEST_HOST}:${_GUEST_SRV_FOLDER}" "${_HOST_SRV_FOLDER}"
     
     return $?
 }

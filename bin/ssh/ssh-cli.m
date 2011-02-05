@@ -4,6 +4,9 @@
 # @description Start ssh session to guest
 
 
+include "${MODULE_ROOT}/ssh.api"
+
+
 ssh-cli_exec() {
     if ! alias_loaded -s; then
         return 2
@@ -13,6 +16,6 @@ ssh-cli_exec() {
     local _USERNAME=$(alias_get "guest.username")
     
     ssh -qt $_USERNAME@$_HOST
-        
+    
     return $?
 }

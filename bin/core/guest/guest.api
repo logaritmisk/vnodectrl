@@ -1,0 +1,21 @@
+#!/bin/bash
+
+
+guest_eval() {
+    if ! alias_loaded -s; then
+        return 2
+    fi
+    
+    local _GUEST_REMOTE=$(alias_get "guest.remote")
+    local _GUEST_PASSWORD=$(alias_get "guest.password")
+    
+    local _command="$@"
+    
+    if [ -n "${_GUEST_PASSWORD}" ]; then
+        _command=$(echo $_command | sed -E 's/%sudo%[ \t]*(.*)/(sudo -k; echo '"${_GUEST_PASSWORD}"' | sudo -S \1) | tail -n +2/g')
+    fi
+    
+    is_function "${_GUEST_REMOTE}_remote_eval" && "${_GUEST_REMOTE}_remote_eval" "${_command}"
+    
+    return $?
+}
