@@ -8,8 +8,8 @@
 readonly VNODECTRL_VERSION="11.01-dev-alpha1"
 readonly VNODECTRL_BASENAME=`basename $0`
 
-readonly VNODECTRL_PATH_ROOT="/Users/olsson/Workspace/devtools/vnodectrl"
-#readonly VNODECTRL_PATH_ROOT="/usr/vnodectrl"
+#readonly VNODECTRL_PATH_ROOT="/Users/olsson/Workspace/devtools/vnodectrl"
+readonly VNODECTRL_PATH_ROOT="/usr/vnodectrl"
 readonly VNODECTRL_PATH_USER="$HOME/.vnodectrl.d"
 
 readonly VNODECTRL_PATH_LIB="${VNODECTRL_PATH_ROOT}/lib"
@@ -90,3 +90,7 @@ if is_function "${1}_exec"; then
     
     exit "${R}"
 fi
+
+core_help
+
+exit 1

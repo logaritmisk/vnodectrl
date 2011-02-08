@@ -52,19 +52,37 @@ is_function() {
 }
 
 dispatch() {
-    local HOOK=${1?'Error: missing parameter'}
+    local _post=false
+    local _pre=false
     
-    local module
+    while [ "${1:0:1}" == "%" ]; do
+        case "${1:1}" in
+            'post') _post=true ;;
+            'pre') _pre=true ;;
+            *) break ;;
+        esac
+        
+        shift
+    done
     
+    local _HOOK="${1?'Error: missing parameter'}"
+    local _module
     
     shift
     
-    for module in $(module_get_loaded); do
-        if is_function "${module}_${HOOK}"; then
-            "${module}_${HOOK}" "$@"
+    for _module in $(module_get_loaded); do
+        if [ ${_post} ] && is_function "${_module}_${_HOOK}_post"; then
+            "${_module}_${_HOOK}_post" "$@"
+        fi
+        
+        if is_function "${_module}_${_HOOK}"; then
+            "${_module}_${_HOOK}" "$@"
+        fi
+        
+        if [ ${_pre} ] && is_function "${_module}_${_HOOK}_pre"; then
+            "${_module}_${_HOOK}_pre" "$@"
         fi
     done
-    
     
     return 0
 }
