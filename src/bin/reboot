@@ -32,7 +32,7 @@ reboot_exec() {
     fi
 
 
-    ssh -q -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -k; echo $guest_pass | sudo -S reboot" | tail -n +1
+    ssh -qT -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -K; echo $guest_pass | sudo -S reboot" 2> /dev/null
 
 
     return $?
