@@ -33,7 +33,7 @@ apache2_exec() {
     local guest_addr=$(vnode_identity_get 'guest_addr')
 
 
-    ssh -qt -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -k; echo $guest_pass | sudo -S /etc/init.d/apache2 $1" | tail -n +1
+    ssh -qT -oStrictHostKeyChecking=no $guest_user@$guest_addr "sudo -K; echo $guest_pass | sudo -S /etc/init.d/apache2 $1" 2> /dev/null
 
 
     return $?
