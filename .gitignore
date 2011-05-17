@@ -3,3 +3,4 @@ settings
 .*~
 *~
 src/vnodectrl.conf
+*.pyc
