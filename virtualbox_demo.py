@@ -10,7 +10,7 @@ from virtualbox import VirtualBoxNodeDriver
 
 
 def main():
-	vbox_driver = VirtualBoxNodeDriver()
+	vbox_driver = VirtualBoxNodeDriver('')
 	
 	nodes = vbox_driver.list_nodes()
 	pprint(nodes)
@@ -24,25 +24,27 @@ def main():
 	node = vbox_driver.create_node(name='my-new-awesome-node', image=images[0], size=sizes[0])
 	pprint(node)
 	
-	sleep(25)
+	sleep(180)
 	
-	nodes = vbox_driver.list_nodes()
-	pprint(nodes)
+	pprint(node)
 	
-	result = vbox_driver.shutdown_node(node)
-	pprint(result)
+	#nodes = vbox_driver.list_nodes()
+	#pprint(nodes)
 	
-	result = vbox_driver.destroy_node(node)
-	pprint(result)
+	#result = vbox_driver.ex_shutdown_node(node)
+	#pprint(result)
 	
-	nodes = vbox_driver.list_nodes()
-	pprint(nodes)
+	#result = vbox_driver.destroy_node(node)
+	#pprint(result)
+	
+	#nodes = vbox_driver.list_nodes()
+	#pprint(nodes)
     
-	result = vbox_driver.startup_node(nodes[0])
-	pprint(result)
+	#result = vbox_driver.startup_node(nodes[0])
+	#pprint(result)
 	
-	result = vbox_driver.shutdown_node(nodes[0])
-	pprint(result)
+	#result = vbox_driver.shutdown_node(nodes[0])
+	#pprint(result)
 	
 
 if __name__ == '__main__':
