@@ -1,9 +1,9 @@
 import os
 import sys
 import os.path
-from optparse import OptionParser
 import plugins
 import utils
+from optparse import OptionParser
 from plugins import *
 
 def main(args):
