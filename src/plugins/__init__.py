@@ -1,2 +1,2 @@
-__all__ = ["config", "list", "node"]
+__all__ = ["config", "list", "node", "deploy"]
 	

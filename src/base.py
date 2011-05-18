@@ -39,6 +39,26 @@ class VnodectrlPlugin:
 		except Exception, e:
 			print ">> Fatal error: %s" % e
 			return False
+	
+	def getSize(self, conn, size):
+		# TODO: There are way more elegant ways
+		# to do this in python, I just can't be
+		# bothered to look them up atm.
+		sizes = conn.list_sizes()
+		for available_size in sizes:
+			if available_size.id == size:
+				return available_size
+		return False
+		
+	def getImage(self, conn, image):
+		# TODO: There are way more elegant ways
+		# to do this in python, I just can't be
+		# bothered to look them up atm.
+		images = conn.list_images()
+		for available_image in images:
+			if available_image.id == image:
+				return available_image
+		return False
 
 class VnodectrlException(Exception):
 	def __init__(self, value):

@@ -8,7 +8,6 @@ def getConfig(path):
 		data = open(path);
 		return json.load(data)
 	except Exception, e:
-		print e
 		return False
 
 def getProvider(driver):
