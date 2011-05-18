@@ -43,6 +43,6 @@ def main(args):
 	else:
 		print "Available Commands:\n"
 		for command, options in commands.iteritems():
-			print "{0}\t{1}\n".format(command, options['description']);
+			print "{0}\t{1}".format(command, options['description']);
 
 sys.exit(main(sys.argv))
