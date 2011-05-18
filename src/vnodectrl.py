@@ -1,4 +1,5 @@
 import os
+import os.path
 from optparse import OptionParser
 import plugins
 import utils
@@ -6,7 +7,13 @@ from plugins import *
 
 modules = []
 commands = {}
-configuration = utils.getConfig("/home/fabsor/projects/vnodectrl/src/vnodectrl.conf")
+# Locate the configuration.
+current_dir = os.getcwd()
+path = "{0}/vnodectrl.conf".format(current_dir)
+configuration = utils.getConfig(path)
+
+# Locate deployment instructions.
+configuration["deployment"] = utils.getDeploymentConfig()
 
 for plugin in plugins.__all__:
 	module = getattr(plugins, plugin)
