@@ -2,7 +2,7 @@ import base
 from base import VnodectrlPlugin
 
 from libcloud.compute.types import Provider
-from libcloud.providers import get_driver
+from libcloud.compute.providers import get_driver
 import sys; sys.path.append('..')
 import utils
 

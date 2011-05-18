@@ -2,7 +2,7 @@ import os
 import os.path
 import json
 from libcloud.compute.types import Provider
-from libcloud.providers import get_driver
+from libcloud.compute.providers import get_driver
 import virtualbox
 
 def getConfig(path):
