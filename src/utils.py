@@ -2,6 +2,8 @@ import os
 import os.path
 import json
 from libcloud.compute.types import Provider
+from libcloud.providers import get_driver
+import virtualbox
 
 def getConfig(path):
 	try:
@@ -15,10 +17,20 @@ def getProvider(driver):
 	Get a provider based on the string in the config.
 	"""
 	drivers = {
-		"ec2-europe": Provider.EC2_EU_WEST
+		"ec2-europe": Provider.EC2_EU_WEST,
+		"virtualbox": "virtualbox"
 		# Just fill out the rest of the gang later on.
 	}
-	return drivers.get(driver, False)
+	if driver in drivers:
+		real_driver = drivers[driver]
+		# The Virtualbox driver is not really included in liblcoud,
+		# so we add it ourselves here.
+		if driver == "virtualbox":
+			return virtualbox.VirtualBoxNodeDriver	
+		
+		return get_driver(real_driver)
+	
+	return False
 
 def getDeploymentConfig(path = os.getcwd()):
 	"""

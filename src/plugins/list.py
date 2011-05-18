@@ -23,7 +23,7 @@ class ListPlugin(VnodectrlPlugin):
 	def __init__(self, config):
 		self.config = config;
 		
-	def execute(self, cmd, args, options):
+	def execute(self, cmd, args, options):	
 		for driver,settings in self.config["drivers"].iteritems():
 			if args.count(driver) > 0 or len(args) == 1:
 				try:
@@ -42,7 +42,7 @@ class ListPlugin(VnodectrlPlugin):
 	def listNodes(self, conn):
 		nodes = conn.list_nodes()
 		for node in nodes:
-			print "name: {0}\t instance: {1}\t ip: {2}\t status: {3}\t type: {4}".format(node.name, node.extra["imageId"], node.public_ip[0], node.extra["status"], node.extra["instancetype"])
+			print "name: {0}\t".format(node.name)
 	
 	def listImages(self, conn):
 		images = conn.list_images()

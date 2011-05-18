@@ -34,7 +34,6 @@ class DeployPlugin(VnodectrlPlugin):
 			return False
 		
 		deploy_settings = self.config.get("deployment", False)
-		print deploy_settings
 		if deploy_settings == False:
 			print "No deployment settings found. Check your .vnodectrl file."
 			return False
@@ -43,10 +42,11 @@ class DeployPlugin(VnodectrlPlugin):
 			try:
 				conn = self.connect(driver, settings["id"], settings["key"])
 				for name, settings in deploy_settings[driver].iteritems():
-					size = self.getSize(conn, str(settings["size"]))
+					size = settings.get("size", False)
+					size = self.getSize(driver, conn, size)
 					if size == False:
 						print "The size you specified does not exist. Please select a valid size"
-					image = self.getImage(conn, str(settings["image"]))
+					image = self.getImage(driver, conn, str(settings["image"]))
 					if image == False:
 						print "The image you selected does not exist."
 					print "Creating node {0}. Selected size: {1} ({2})\tSelected image: {3} ({4})".format(name, size.id, size.name, image.id, image.name)
