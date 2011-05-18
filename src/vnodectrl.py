@@ -6,7 +6,7 @@ from plugins import *
 
 modules = []
 commands = {}
-configuration = utils.getConfig("/home/fabsor/projects/vnodectrl/src/default.conf")
+configuration = utils.getConfig("/home/fabsor/projects/vnodectrl/src/vnodectrl.conf")
 
 for plugin in plugins.__all__:
 	module = getattr(plugins, plugin)

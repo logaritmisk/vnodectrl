@@ -14,4 +14,4 @@ def getProvider(driver):
 		"ec2-europe": Provider.EC2_EU_WEST
 		# Just fill out the rest of the gang later on.
 	}
-	return drivers[driver];
+	return drivers.get(driver, False);

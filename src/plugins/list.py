@@ -27,8 +27,7 @@ class ListPlugin(VnodectrlPlugin):
 		for driver,settings in self.config["drivers"].iteritems():
 			if args.count(driver) > 0 or len(args) == 1:
 				try:
-					Driver = get_driver(utils.getProvider(str(driver)))
-					conn = Driver(str(settings["id"]), str(settings["key"]))
+					conn = self.connect(driver, settings["id"], settings["key"])
 					if cmd == "list-nodes":
 						self.listNodes(conn)
 					elif cmd == "list-images":
@@ -43,9 +42,9 @@ class ListPlugin(VnodectrlPlugin):
 	def listNodes(self, conn):
 		nodes = conn.list_nodes()
 		for node in nodes:
-			print "Provider: {0}\t name: {1}\t ip: {2}".format(driver,node.name, node.public_ip[0])
+			print "name: {0}\t instance: {1}\t ip: {2}\t status: {3}\t type: {4}".format(node.name, node.extra["imageId"], node.public_ip[0], node.extra["status"], node.extra["instancetype"])
 	
 	def listImages(self, conn):
 		images = conn.list_images()
-		for image in images[:10]:
-			print "name: {0}".format(image.name)
+		for image in images:
+			print "name: {0}\t id: {1}".format(image.name, image.id)
