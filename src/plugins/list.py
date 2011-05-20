@@ -42,7 +42,7 @@ class ListPlugin(VnodectrlPlugin):
 	def listNodes(self, conn):
 		nodes = conn.list_nodes()
 		for node in nodes:
-			print "name: {0}\t".format(node.name)
+			print "name: {0}\t id: {1}\t IP: {2}\t".format(node.name, node.id, node.public_ip)
 	
 	def listImages(self, conn):
 		images = conn.list_images()

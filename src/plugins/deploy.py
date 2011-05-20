@@ -47,6 +47,7 @@ class DeployPlugin(VnodectrlPlugin):
 						print "The image you selected does not exist."
 					print "Creating node {0}. Selected size: {1} ({2})\tSelected image: {3} ({4})".format(name, size.id, size.name, image.id, image.name)
 					node = conn.create_node(name=name, image=image, size=size)
+					print node.__dict__
 					print "node {0} created".format(node.name)
 			except NameError, e:
 				print ">> Fatal Error: %s" % e

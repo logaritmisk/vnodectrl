@@ -10,6 +10,7 @@ def getConfig(path):
 		data = open(path);
 		return json.load(data)
 	except Exception, e:
+		print "Syntax error: {0}".format(e)
 		return False
 
 def getProvider(driver):
@@ -40,6 +41,7 @@ def getDeploymentConfig(path = os.getcwd()):
 	if path == '/':
 		return False
 	if os.path.isfile(deployfile):
+		print deployfile
 		return getConfig(deployfile)
 	else:
 		return getDeploymentConfig(os.path.split(path)[0])

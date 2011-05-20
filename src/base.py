@@ -1,5 +1,5 @@
 from libcloud.compute.types import Provider
-from libcloud.providers import get_driver
+from libcloud.compute.providers import get_driver
 import sys; sys.path.append('..')
 import utils
 
@@ -76,6 +76,16 @@ class VnodectrlPlugin:
 			if available_image.id == image:
 				return available_image
 		return False
+	
+	def getNode(self, driver, conn, node):
+		# TODO: There are way more elegant ways
+		# to do this in python, I just can't be
+		# bothered to look them up atm.
+		nodes = conn.list_nodes()
+		for available_node in nodes:
+			if available_node.name == node:
+				return available_image
+		return False		
 
 class VnodectrlException(Exception):
 	def __init__(self, value):
