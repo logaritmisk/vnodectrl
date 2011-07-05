@@ -5,7 +5,7 @@ from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 import virtualbox
 
-def getConfig(path):
+def get_config(path):
 	try:
 		data = open(path);
 		return json.load(data)
@@ -13,7 +13,7 @@ def getConfig(path):
 		print "Syntax error: {0}".format(e)
 		return False
 
-def getProvider(driver):
+def get_provider(driver):
 	"""
 	Get a provider based on the string in the config.
 	"""
@@ -33,7 +33,7 @@ def getProvider(driver):
 	
 	return False
 
-def getDeploymentConfig(path = os.getcwd()):
+def get_deployment_config(path = os.getcwd()):
 	"""
 	Get deployment configuration.
 	"""
@@ -42,6 +42,6 @@ def getDeploymentConfig(path = os.getcwd()):
 		return False
 	if os.path.isfile(deployfile):
 		print deployfile
-		return getConfig(deployfile)
+		return get_config(deployfile)
 	else:
-		return getDeploymentConfig(os.path.split(path)[0])
+		return get_deployment_config(os.path.split(path)[0])

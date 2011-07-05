@@ -29,7 +29,7 @@ class VnodectrlPlugin:
 		and a key.
 		"""
 		try:
-			driver_class = utils.getProvider(driver)
+			driver_class = utils.get_provider(driver)
 			# Temporary to get support
 			if driver == "virtualbox":
 				conn = driver_class()

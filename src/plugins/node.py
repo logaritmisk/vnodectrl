@@ -29,7 +29,7 @@ class NodeCreatePlugin(VnodectrlPlugin):
 			return False
 		
 		driver = args[1]
-		if utils.getProvider(driver) == False:
+		if utils.get_provider(driver) == False:
 			print "The provider you specified doesn't exist"
 			return False
 		
@@ -71,7 +71,7 @@ class NodeDestroyPlugin(VnodectrlPlugin):
 			return False
 		
 		driver = args[1]
-		if utils.getProvider(driver) == False:
+		if utils.get_provider(driver) == False:
 			print "The provider you specified doesn't exist"
 			return False
 		
