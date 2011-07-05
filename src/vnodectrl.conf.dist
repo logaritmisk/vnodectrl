@@ -3,9 +3,9 @@
         "ec2-europe": {
             "id": "your-amazon-id",
             "key": "your-amazon-key"
-        }
+        },
         "virtualbox": {
-			"id": "placeholder"
+			"id": "placeholder",
 			"key" "data"
         }
     }
