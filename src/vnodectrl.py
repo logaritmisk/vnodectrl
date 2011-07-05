@@ -5,9 +5,10 @@ import utils
 from optparse import OptionParser
 from plugins import *
 
+modules = []
+commands = {}
+
 def main(args):
-	modules = []
-	commands = {}
 	# Locate the configuration.
 	config_file = "{0}/.vnodectrl.d/3.x/vnodectrl.conf".format(os.getenv("HOME"));
 	configuration = utils.get_config(config_file)
@@ -34,7 +35,7 @@ def main(args):
 		command_info = commands.get(primary_command, None);
 		if command_info != None:
 			plugin_class = getattr(command_info['module'], command_info['plugin'])
-			plugin = plugin_class(configuration);
+			plugin = plugin_class(configuration)
 			plugin.execute(primary_command, args, options)
 		else:
 			print "Unrecognized command"
