@@ -10,12 +10,18 @@ COMMANDS = {
 	"list-nodes" : {
 		"description": "List nodes",
 		"plugin": "ListPlugin",
-		"name": "list-nodes"
+		"name": "list-nodes",
+		"arguments": {
+			"provider" : "The provider to list nodes from, for instance ec2-europe."
+		}
 	},
 	"list-images" : {
-		"description": "List nodes",
+		"description": "List images",
 		"plugin": "ListPlugin",
-		"name": "list-images"
+		"name": "list-images",
+		"arguments": {
+			"provider" : "The provider to list nodes from, for instance ec2-europe."
+		}
 	}
 }
 

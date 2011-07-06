@@ -6,7 +6,10 @@ COMMANDS = {
 	"deploy" : {
 		"description": "Deploy a project",
 		"plugin": "DeployPlugin",
-		"name": "deploy"
+		"name": "deploy",
+		"arguments": {
+			"provider": "The provider you want to deploy to, for instance ec2-europe",
+		},
 	},
 }
 

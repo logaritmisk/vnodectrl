@@ -5,6 +5,10 @@ from libcloud.compute.providers import get_driver
 import virtualbox
 
 def get_config(path):
+	'''
+	Get configuration in the form of a dictionary
+	from a configuration file on the given path.
+	'''
 	try:
 		data = open(path);
 		return json.load(data)
@@ -13,9 +17,9 @@ def get_config(path):
 		return False
 
 def get_provider(driver):
-	"""
+	'''
 	Get a provider based on the string in the config.
-	"""
+	'''
 	drivers = {
 		"ec2-europe": Provider.EC2_EU_WEST,
 		"virtualbox": "virtualbox"
@@ -33,9 +37,9 @@ def get_provider(driver):
 	return False
 
 def get_deployment_config(path = os.getcwd()):
-	"""
+	'''
 	Get deployment configuration.
-	"""
+	'''
 	deployfile = "{0}/.vnodectrl".format(path)
 	if path == '/':
 		return False

@@ -8,17 +8,25 @@ COMMANDS = {
 	"dns-record-add" : {
 		"description": "Add DNS record",
 		"plugin": "DNSPlugin",
-		"name": "bind-record-add"
+		"name": "bind-record-add",
+		"arguments": {
+			"name": "The name of the record you want to add, for instance 'www'",
+			"type": "The type of the record, for instance 'A'",
+			"address": "The address for the record, the format depends on the type of record."
+		}
 	},
 	"dns-record-delete" : {
 		"description": "Delete DNS record.",
 		"plugin": "DNSPlugin",
-		"name": "dns-record-delete"
+		"name": "dns-record-delete",
+		"arguments": {
+			"name": "The name of the DNS record to remove."
+		}
 	},
 	"dns-record-list" : {
 		"description": "List DNS Records in zone.",
 		"plugin": "DNSPlugin",
-		"name": "dns-record-list"						
+		"name": "dns-record-list"
 	}
 }
 

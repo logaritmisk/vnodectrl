@@ -10,12 +10,22 @@ COMMANDS = {
 	"create-node" : {
 		"description": "Create node",
 		"plugin": "NodeCreatePlugin",
-		"name": "create-node"
+		"name": "create-node",
+		"arguments": {
+			"provider" : "The provider you want to use, for instance ec2-europe",
+			"image" : "The image to use for this instance. For a list of images, use vnodectrl list-images.",
+			"size" : "The size of the instance you want to create.",
+			"name" : "The name of the image to create."
+		}
 	},
 	"destroy-node": {
 		"description": "Destroy node",
 		"plugin": "NodeDestroyPlugin",
-		"name": "create-node"
+		"name": "destroy-node",
+		"arguments" : {
+			"provider" : "The provider of the node.",
+			"node": "The ID of the node."
+		}
 	}
 }
 
