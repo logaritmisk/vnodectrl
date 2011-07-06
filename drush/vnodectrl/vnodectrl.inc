@@ -1,9 +1,16 @@
 <?php
+/**
+ * @file
+ * This file contains some utility functions for dealing with vnodectrl stuff.
+ */
+
+// Temporary solution! When we have an installation script in place for vnodectrl, it will be in our
+// path.
 define('VNODECTRL', 'python /home/fabsor/projects/vnodectrl/src/vnodectrl.py');
+
 /**
  * Fetch vnodectrl configuration.
  */
-
 function vnodectrl_get_configuration() {
   $conf_path = $home_dir . '.vnodectrl.d/3.x/vnodectrl.conf';
   if (file_exists($conf_path)) {
@@ -35,6 +42,8 @@ function vnodectrl_get_deploy_config($path = FALSE) {
 
 /**
  * Get commands from vnodectrl.
+ * @return array
+ * 	An array with all commands that exists in vnodectrl.
  */
 function vnodectrl_get_commands() {
   // Execute the vnodectrl list
@@ -45,6 +54,19 @@ function vnodectrl_get_commands() {
   return $commands;
 }
 
+/**
+ * Execute a vnodectrl command.
+ * @param string $command
+ * 	The command to execute
+ * @param array $output
+ * 	This array will be populated with the output of the command.
+ * @param array $args
+ * 	Add any arguments the command needs here.
+ * @param array $options
+ * 	Provide a keyed array with the options for the command here.
+ * @return boolean
+ * 	The execution status of the command.
+ */
 function vnodectrl_execute_command($command, &$output, $args = array(), $options = array()) {
   $args = implode(' ', $args);
   $result = drush_shell_exec(VNODECTRL . ' ' . $command . ' ' . $args);

@@ -49,8 +49,7 @@ function vnodectrl_drush_command() {
 }
 
 /**
- * Deploy a site by telling the an aegir instance about the servers and which repository
- * we are going to be dealing with.
+ * Execute any given vnodectrl command.
  */
 function drush_vnodectrl_exec() {
   $args = func_get_args();
