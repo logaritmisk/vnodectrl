@@ -4,22 +4,22 @@ import sys; sys.path.append('..')
 import utils
 
 class VnodectrlOptions:
-	def options():
+	def options(self):
 		"""
 		Declare all options here.
 		"""
 
 class VnodectrlPlugin:
-	def commands():
+	def commands(self):
 		"""
 		Declare all commands here.
 		"""
-	def help(cmd):
+	def help(self, cmd):
 		"""
 		Specify help for a specific command here.
 		"""
 
-	def execute(cmd):
+	def execute(self, cmd):
 		"""
 		Act on a particular command here
 		"""
@@ -84,7 +84,7 @@ class VnodectrlPlugin:
 		nodes = conn.list_nodes()
 		for available_node in nodes:
 			if available_node.name == node:
-				return available_image
+				return available_node
 		return False		
 
 class VnodectrlException(Exception):

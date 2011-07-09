@@ -1,6 +1,5 @@
-import base
-from base import VnodectrlPlugin
-import utils
+from vnodectrl.base import VnodectrlPlugin
+from vnodectrl import utils
 
 COMMANDS = {
 	"deploy" : {

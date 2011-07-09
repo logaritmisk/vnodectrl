@@ -1,5 +1,6 @@
 import os.path
 import json
+import plugins
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 import virtualbox
@@ -48,3 +49,22 @@ def get_deployment_config(path = os.getcwd()):
 		return get_config(deployfile)
 	else:
 		return get_deployment_config(os.path.split(path)[0])
+
+def get_commands():
+	'''
+	Get all vnodectrl plugins available.
+	'''
+	commands = {}
+	modules = []
+	# Load Core plugins
+	for plugin in plugins.__all__:
+		module = getattr(plugins, plugin)
+		modules.append(module)
+		for command, options in module.COMMANDS.iteritems():
+			options['module'] = module
+			commands[command] = options
+	return commands
+	# @todo: Let users specify packates from which we should fetch
+	# other plugins not in the core distribution.
+	
+	

@@ -1,10 +1,7 @@
-import base
-from base import VnodectrlPlugin
-
+from vnodectrl.base import VnodectrlPlugin
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 import sys; sys.path.append('..')
-import utils
 
 COMMANDS = {
 	"list-nodes" : {

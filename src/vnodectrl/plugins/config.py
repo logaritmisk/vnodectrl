@@ -1,5 +1,5 @@
-import base
-from base import VnodectrlPlugin
+import vnodectrl.base
+from vnodectrl.base import VnodectrlPlugin
 
 COMMANDS = {
 	"list-drivers" : {

@@ -4,7 +4,8 @@ Created on 5 jul 2011
 @author: fabsor
 '''
 import json
-from base import VnodectrlPlugin
+from vnodectrl.base import VnodectrlPlugin
+from vnodectrl import utils
 COMMANDS = {
     "list-plugins" : {
         "description": "List all available plugins in different formats",
@@ -24,7 +25,7 @@ class PluginInfo(VnodectrlPlugin):
         '''
         self.config = config;
     def execute(self, cmd, args, options):
-        from vnodectrl import commands
+        commands = utils.get_commands()
         json_export = []
         for command, options in commands.iteritems():
             # Delete module, since it's not serializable. 

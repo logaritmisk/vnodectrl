@@ -1,4 +1,4 @@
-from base import VnodectrlPlugin
+from vnodectrl.base import VnodectrlPlugin
 import dns.zone
 from dns.exception import DNSException
 from dns.rdataclass import *

@@ -1,14 +1,13 @@
+#!/usr/bin/env python
 import os
 import sys
-import plugins
-import utils
+import vnodectrl.plugins
+from vnodectrl import utils
 from optparse import OptionParser
-from plugins import *
-
-modules = []
-commands = {}
+from vnodectrl.plugins import *
 
 def main(args):
+	commands = {}
 	# Locate the configuration.
 	config_file = "{0}/.vnodectrl.d/3.x/vnodectrl.conf".format(os.getenv("HOME"));
 	configuration = utils.get_config(config_file)
@@ -20,12 +19,8 @@ def main(args):
 	# Locate deployment instructions.
 	configuration["deployment"] = utils.get_deployment_config()
 
-	for plugin in plugins.__all__:
-		module = getattr(plugins, plugin)
-		modules.append(module)
-		for command, options in module.COMMANDS.iteritems():
-			options['module'] = module
-			commands[command] = options
+	# Get all commands.
+	commands = utils.get_commands()
 
 	parser = OptionParser()
 	(options, args) = parser.parse_args()
