@@ -1,0 +1,86 @@
+<?php
+/**
+* @file
+*   Install, update and uninstall for the vnodectrl module.
+*/
+
+/**
+ * Implementation of hook_schema().
+ */
+function vnodectrl_schema() {
+  // We store information about instances we have created here.
+  $schema['vnodectrl_instance'] = array(
+    'fields' => array(
+      'vid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'provider' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+      'image' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+      'size' => array(
+       	'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+  	  'name' => array(
+      	'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('vid', 'nid'),
+  );
+  // We store available images here.
+  $schema['vnodectrl_images'] = array(
+    'fields' => array(
+      'iid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'name' => array(
+          'type' => 'text',
+          'size' => 'big',
+          'not null' => TRUE,
+        ),
+        'title' => array(
+	      'type' => 'text',
+          'size' => 'big',
+          'not null' => TRUE,
+        ),
+        'description' => array(
+          'type' => 'text',
+          'size' => 'big',
+          'default' => '',
+          'not null' => TRUE,
+        ),
+    ),
+    'primary key' => array('iid'),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function vnodectrl_install() {
+  // Create tables.
+  drupal_install_schema('vndodectrl');
+}

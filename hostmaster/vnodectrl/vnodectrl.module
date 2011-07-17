@@ -1,0 +1,181 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Main module file for the vnodectrl aegir frontend.
+ *
+ */
+
+function vnodectrl_node_info() {
+  return array(
+    'vnodectrl_instance' => array(
+      'name' => t('Cloud server instance'),
+      'module' => 'node_example',
+      'description' => t("A cloud server instance running on a provider supported by libcloud."),
+      'has_title' => TRUE,
+      'title_label' => t('Instance title'),
+      'has_body' => FALSE,
+    )
+  );
+}
+
+function vnodectrl_access($op, $node, $account) {
+  if ($op == 'create') {
+    return user_access('create vnodectrl_instance content', $account);
+  }
+
+  if ($op == 'update') {
+    if (user_access('edit any vnodectrl_instance content', $account) || (user_access('edit own vnodecltr_instance content', $account) && ($account->uid == $node->uid))) {
+      return TRUE;
+    }
+  }
+
+  if ($op == 'delete') {
+    if (user_access('delete any vnodectrl_instance content', $account) || (user_access('delete own vnodectrl_instance content', $account) && ($account->uid == $node->uid))) {
+      return TRUE;
+    }
+  }
+}
+
+function vnodectrl_perm() {
+  return array(
+    'create vnodectrl content',
+    'delete own vnodectrl content',
+    'delete any vnodectrl content',
+    'edit own vnodectrl content',
+    'edit any vnodectrl content',
+  );
+}
+
+function vnodectrl_form(&$node, $form_state) {
+  // The site admin can decide if this node type has a title and body, and how
+  // the fields should be labeled. We need to load these settings so we can
+  // build the node form correctly.
+  $type = node_get_types('type', $node);
+
+  if ($type->has_title) {
+    $form['title'] = array(
+      '#type' => 'textfield',
+      '#title' => check_plain($type->title_label),
+      '#required' => TRUE,
+      '#default_value' => $node->title,
+      '#weight' => -5
+    );
+  }
+
+  if ($type->has_body) {
+    // In Drupal 6, we use node_body_field() to get the body and filter
+    // elements. This replaces the old textarea + filter_form() method of
+    // setting this up. It will also ensure the teaser splitter gets set up
+    // properly.
+    $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
+  }
+  $form['provider'] => array(
+    '#type' => 'select',
+    '#title' => t('Provider'),
+    '#required' => TRUE,
+    '#options' => vnodectrl_get_providers(),
+  );
+  $form['image'] => array(
+  	'#type' => 'select',
+    '#title' => t('Provider'),
+    '#required' => TRUE,
+    '#options' => vnodectrl_get_images($node->provider),
+  ),
+  $form['size'] = array(
+    '#type' => 'select',
+    '#title' => t('Size'),
+    '#required' => TRUE,
+    '#options' => vnodectrl_get_sizes($node->provider),
+  );
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Instance name')
+    '#default_value' => check_plain($node->title),
+    '#required' => TRUE,
+    '#description' => t('A machine-readable name for this vnodectrl instance. This name may contain only lower case letters, _ and numbers.'),
+  );
+  return $form;
+}
+
+function vnodetrl_validate($node, &$form) {
+  // @todo validate machine name
+
+}
+
+function vnodectrl_insert($node) {
+  db_write_record('vnodectrl_instance', $node);
+}
+
+function vnodectrl_update($node) {
+  // Save a new node if we are adding a revision.
+  if ($node->revision) {
+    vnodectrl_insert($node);
+  }
+  else {
+    db_query("UPDATE vnodectrl_instance SET provider = '%s', name = '%s', image = '%s', size = '%s' WHERE nid = %d AND vid = %d", $node->nid, $node->vid);
+  }
+}
+
+function vnodectrl_load($node) {
+  return db_fetch_object(db_query("SELECT provider, name, image, size FROM {vnodectrl_instance} WHERE nid = %d AND vid = %d", $node->nid, $node->vid));
+}
+
+/**
+ * Get a list of images available from the given provider.
+ */
+function vnodectrl_get_images() {
+  return array('fake' => 'fake');
+}
+
+/**
+ * Get a list of available images for a particular provider.
+ */
+function vnodectrl_get_sizes($provider) {
+  // @todo Actually fetch this through vnodectrl.
+  return array(
+    't1.micro' => 'Micro Instance',
+    'm1.small' => 'Small Instance',
+    'm1.large' => 'Large Instance',
+    'm1.xlarge' => 'Extra Large Instance',
+    'c1.medium' => 'High-CPU Medium Instance',
+    'c1.xlarge' => 'High-CPU Extra Large Instance',
+    'm2.xlarge' => 'High-Memory Extra Large Instance',
+    'm2.2xlarge' => 'High-Memory Double Extra Large Instance',
+    'm2.4xlarge' => 'High-Memory Quadruple Extra Large Instance',
+    'cg1.4xlarge'=> 'Cluster GPU Quadruple Extra Large Instance'
+    'cc1.4xlarge'=> 'Cluster Compute Quadruple Extra Large Instance',
+  );
+}
+
+/**
+ * Get a list of available providers.
+ */
+function vnodectrl_get_providers() {
+  // @todo Actually fetch this from vnodectrl.
+  return array(
+    'ec2-europe',
+  );
+}
+
+/**
+ * Implementation of hook_hosting_feature().
+ */
+function hosting_example_hosting_feature() {
+  $features['vnodectrl'] = array(
+  // title to display in form
+    'title' => t('Vnodectrl'),
+  // description
+    'description' => t('Let\'s you create new cloud server instances through libcloud'),
+  // initial status ( HOSTING_FEATURE_DISABLED, HOSTING_FEATURE_ENABLED, HOSTING_FEATURE_REQUIRED )
+    'status' => HOSTING_FEATURE_DISABLED,
+  // module to enable/disable alongside feature
+    'module' => 'vnodectrl',
+  // associate with a specific node type.
+    'node' => 'vnodectrl_instance',
+  // which group to display in ( null , experimental )
+    'group' => 'experimental'
+  );
+  return $features;
+}

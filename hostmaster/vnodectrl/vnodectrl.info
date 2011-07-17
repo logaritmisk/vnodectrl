@@ -1,0 +1,6 @@
+
+name = Vnodectrl
+description = Let's you set up new cloud server instances through libcloud.
+core = 6.x
+package = Hosting
+dependencies[] = hosting
