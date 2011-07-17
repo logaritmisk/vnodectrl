@@ -3,7 +3,6 @@ import json
 import plugins
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
-import virtualbox
 
 def get_config(path):
 	'''
