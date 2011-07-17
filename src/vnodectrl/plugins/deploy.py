@@ -1,4 +1,5 @@
 from vnodectrl.base import VnodectrlPlugin
+from vnodectrl.base import libcloud_requirements
 from vnodectrl import utils
 
 COMMANDS = {
@@ -6,6 +7,7 @@ COMMANDS = {
 		"description": "Deploy a project",
 		"plugin": "DeployPlugin",
 		"name": "deploy",
+		"requirements": libcloud_requirements,
 		"arguments": {
 			"provider": "The provider you want to deploy to, for instance ec2-europe",
 		},

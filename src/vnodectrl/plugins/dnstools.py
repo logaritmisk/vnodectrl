@@ -1,14 +1,27 @@
 from vnodectrl.base import VnodectrlPlugin
-import dns.zone
-from dns.exception import DNSException
-from dns.rdataclass import *
-from dns.rdatatype import *
+try:
+	import dns.zone
+	from dns.exception import DNSException
+	from dns.rdataclass import *
+	from dns.rdatatype import *
+except ImportError:
+	'''
+	Fail.
+	'''
+
+def requirements():
+	try:
+		import dns.zone
+		return True
+	except ImportError:
+		return False
 
 COMMANDS = {
 	"dns-record-add" : {
 		"description": "Add DNS record",
 		"plugin": "DNSPlugin",
 		"name": "bind-record-add",
+		"requirements": requirements,
 		"arguments": {
 			"name": "The name of the record you want to add, for instance 'www'",
 			"type": "The type of the record, for instance 'A'",
@@ -19,6 +32,7 @@ COMMANDS = {
 		"description": "Delete DNS record.",
 		"plugin": "DNSPlugin",
 		"name": "dns-record-delete",
+		"requirements": requirements,
 		"arguments": {
 			"name": "The name of the DNS record to remove."
 		}
@@ -33,7 +47,7 @@ COMMANDS = {
 class DNSPlugin(VnodectrlPlugin):
 	def __init__(self, config):
 		self.config = config
-		
+	
 	def execute(self, cmd, args, options):
 		"""
 		Main dispatcher for all commands.

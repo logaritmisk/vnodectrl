@@ -1,6 +1,5 @@
 from vnodectrl.base import VnodectrlPlugin
-from libcloud.compute.types import Provider
-from libcloud.compute.providers import get_driver
+from vnodectrl.base import libcloud_requirements
 import sys; sys.path.append('..')
 from vnodectrl import utils
 
@@ -9,6 +8,7 @@ COMMANDS = {
 		"description": "Create node",
 		"plugin": "NodeCreatePlugin",
 		"name": "create-node",
+		"requirements": libcloud_requirements,
 		"arguments": {
 			"provider" : "The provider you want to use, for instance ec2-europe",
 			"image" : "The image to use for this instance. For a list of images, use vnodectrl list-images.",
@@ -20,6 +20,7 @@ COMMANDS = {
 		"description": "Destroy node",
 		"plugin": "NodeDestroyPlugin",
 		"name": "destroy-node",
+		"requirements": libcloud_requirements,
 		"arguments" : {
 			"provider" : "The provider of the node.",
 			"node": "The ID of the node."

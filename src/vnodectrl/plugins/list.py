@@ -1,6 +1,5 @@
-from vnodectrl.base import VnodectrlPlugin
-from libcloud.compute.types import Provider
-from libcloud.compute.providers import get_driver
+from vnodectrl.base import VnodectrlPlugin, libcloud_requirements
+from vnodectrl.base import libcloud_requirements
 import sys; sys.path.append('..')
 
 COMMANDS = {
@@ -8,6 +7,7 @@ COMMANDS = {
 		"description": "List nodes",
 		"plugin": "ListPlugin",
 		"name": "list-nodes",
+		"requirements": libcloud_requirements,
 		"arguments": {
 			"provider" : "The provider to list nodes from, for instance ec2-europe."
 		}

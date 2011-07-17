@@ -6,6 +6,7 @@ COMMANDS = {
 		"description": "List Drivers",
 		"plugin": "ConfigPlugin",
 		"name": "list-drivers",
+		"requirements": vnodectrl.base.libcloud_requirements
 	}
 }
 	

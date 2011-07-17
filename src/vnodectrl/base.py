@@ -1,7 +1,11 @@
-from libcloud.compute.types import Provider
-from libcloud.compute.providers import get_driver
 import sys; sys.path.append('..')
 import utils
+try:
+	from libcloud.compute.types import Provider
+	from libcloud.compute.providers import get_driver
+except ImportError:
+	'''
+	'''
 
 class VnodectrlOptions:
 	def options(self):
@@ -29,7 +33,7 @@ class VnodectrlPlugin:
 		and a key.
 		"""
 		try:
-			driver_class = utils.get_provider(driver)
+			driver_class = get_provider(driver)
 			# Temporary to get support
 			if driver == "virtualbox":
 				conn = driver_class()
@@ -92,3 +96,44 @@ class VnodectrlException(Exception):
 		self.value = value
 	def __str__(self):
 		return repr(self.value)
+
+def libcloud_requirements():
+	'''
+	This function can be used to determine if libcloud exists.
+	It also loads all required modules that might not be present
+	in the system.
+	It returns True if the requirements are met and false otherwise.
+	'''
+	try:
+		from libcloud.compute.types import Provider
+		from libcloud.compute.providers import get_driver
+		return True
+	except ImportError:
+		return False
+	
+def get_provider(driver):
+	'''
+	Get a provider based on the string in the config.
+	'''
+	drivers = {
+		"ec2-europe": Provider.EC2_EU_WEST,
+		"virtualbox": "virtualbox"
+		# Just fill out the rest of the gang later on.
+	}
+	# Try to import the virtualbox driver. Some clients might not have
+	# virtualbox installed, so if they don't, just remove the driver.
+	try:
+		import virtualbox
+	except ImportError:
+		del drivers['virtualbox']
+
+	if driver in drivers:
+		real_driver = drivers[driver]
+		# The Virtualbox driver is not really included in liblcoud,
+		# so we add it ourselves here.
+		if driver == "virtualbox":
+			return virtualbox.VirtualBoxNodeDriver	
+		
+		return get_driver(real_driver)
+	
+	return False
