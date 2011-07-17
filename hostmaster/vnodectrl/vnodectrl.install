@@ -52,8 +52,7 @@ function vnodectrl_schema() {
       'iid' => array(
         'type' => 'serial',
         'unsigned' => TRUE,
-          'not null' => TRUE,
-          'default' => 0,
+        'not null' => TRUE,
         ),
         'name' => array(
           'type' => 'text',
@@ -82,5 +81,9 @@ function vnodectrl_schema() {
  */
 function vnodectrl_install() {
   // Create tables.
-  drupal_install_schema('vndodectrl');
+  drupal_install_schema('vnodectrl');
+}
+
+function vnodectrl_uninstall() {
+  drupal_uninstall_schema('vnodectrl');
 }
