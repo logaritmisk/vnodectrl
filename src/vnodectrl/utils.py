@@ -73,4 +73,14 @@ def get_commands():
 	# @todo: Let users specify packates from which we should fetch
 	# other plugins not in the core distribution.
 	
+def get_main_config():
+	'''
+	Get the main configuration file.
+	'''
+	# Check if this user has their own vnodectrl configuration.
+	config_file = "{0}/.vnodectrl.d/3.x/vnodectrl.conf".format(os.getenv("HOME"));
+	if os.path.exists(config_file):
+		return get_config(config_file)
+	# Otherwise load the global configuration file.
+	return get_config('/etc/vnodectrl/vnodectrl.conf')
 	

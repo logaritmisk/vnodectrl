@@ -11,9 +11,7 @@ from vnodectrl.plugins import *
 def main(args):
     commands = {}
     # Locate the configuration.
-    config_file = "{0}/.vnodectrl.d/3.x/vnodectrl.conf".format(os.getenv("HOME"));
-    configuration = utils.get_config(config_file)
-
+    configuration = utils.get_main_config()
     if configuration == False:
         print "No configuration available. Make sure everything is installed properly"
         return 1
