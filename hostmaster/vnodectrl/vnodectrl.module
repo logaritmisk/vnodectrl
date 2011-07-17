@@ -11,7 +11,7 @@ function vnodectrl_node_info() {
   return array(
     'vnodectrl_instance' => array(
       'name' => t('Cloud server instance'),
-      'module' => 'node_example',
+      'module' => 'vnodectrl',
       'description' => t("A cloud server instance running on a provider supported by libcloud."),
       'has_title' => TRUE,
       'title_label' => t('Instance title'),
@@ -53,7 +53,6 @@ function vnodectrl_form(&$node, $form_state) {
   // the fields should be labeled. We need to load these settings so we can
   // build the node form correctly.
   $type = node_get_types('type', $node);
-
   if ($type->has_title) {
     $form['title'] = array(
       '#type' => 'textfield',
@@ -71,18 +70,18 @@ function vnodectrl_form(&$node, $form_state) {
     // properly.
     $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
   }
-  $form['provider'] => array(
+  $form['provider'] = array(
     '#type' => 'select',
     '#title' => t('Provider'),
     '#required' => TRUE,
     '#options' => vnodectrl_get_providers(),
   );
-  $form['image'] => array(
+  $form['image'] = array(
   	'#type' => 'select',
     '#title' => t('Provider'),
     '#required' => TRUE,
     '#options' => vnodectrl_get_images($node->provider),
-  ),
+  );
   $form['size'] = array(
     '#type' => 'select',
     '#title' => t('Size'),
@@ -91,7 +90,7 @@ function vnodectrl_form(&$node, $form_state) {
   );
   $form['name'] = array(
     '#type' => 'textfield',
-    '#title' => t('Instance name')
+    '#title' => t('Instance name'),
     '#default_value' => check_plain($node->title),
     '#required' => TRUE,
     '#description' => t('A machine-readable name for this vnodectrl instance. This name may contain only lower case letters, _ and numbers.'),
@@ -99,13 +98,13 @@ function vnodectrl_form(&$node, $form_state) {
   return $form;
 }
 
-function vnodetrl_validate($node, &$form) {
+function vnodectrl_validate($node, &$form) {
   // @todo validate machine name
 
 }
 
 function vnodectrl_insert($node) {
-  db_write_record('vnodectrl_instance', $node);
+  drupal_write_record('vnodectrl_instance', $node);
 }
 
 function vnodectrl_update($node) {
@@ -144,7 +143,7 @@ function vnodectrl_get_sizes($provider) {
     'm2.xlarge' => 'High-Memory Extra Large Instance',
     'm2.2xlarge' => 'High-Memory Double Extra Large Instance',
     'm2.4xlarge' => 'High-Memory Quadruple Extra Large Instance',
-    'cg1.4xlarge'=> 'Cluster GPU Quadruple Extra Large Instance'
+    'cg1.4xlarge'=> 'Cluster GPU Quadruple Extra Large Instance',
     'cc1.4xlarge'=> 'Cluster Compute Quadruple Extra Large Instance',
   );
 }
