@@ -26,6 +26,13 @@ def get_provider(driver):
 		"virtualbox": "virtualbox"
 		# Just fill out the rest of the gang later on.
 	}
+	# Try to import the virtualbox driver. Some clients might not have
+	# virtualbox installed, so if they don't, just remove the driver.
+	try:
+		import virtualbox
+	except ImportError:
+		del drivers['virtualbox']
+
 	if driver in drivers:
 		real_driver = drivers[driver]
 		# The Virtualbox driver is not really included in liblcoud,
