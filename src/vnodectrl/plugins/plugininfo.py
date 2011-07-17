@@ -30,6 +30,8 @@ class PluginInfo(VnodectrlPlugin):
         for command, options in commands.iteritems():
             # Delete module, since it's not serializable. 
             del options['module']
+            if 'requirements' in options:
+                del options['requirements']
             options['command'] = command
             json_export.append(options)
         print json.dumps(json_export)
