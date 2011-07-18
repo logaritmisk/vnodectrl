@@ -13,7 +13,7 @@ function vnodectrl_hosting_feature() {
   // module to enable/disable alongside feature
     'module' => 'vnodectrl',
   // associate with a specific node type.
-    'node' => 'vnodectrl_instance',
+    'node' => 'server',
   // which group to display in ( null , experimental )
     'group' => 'experimental'
   );
