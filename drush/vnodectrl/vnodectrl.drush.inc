@@ -70,7 +70,7 @@ function drush_vnodectrl_provision_exec() {
     $provider = drush_get_option('provider', FALSE);
     $name = drush_get_option('name', FALSE);
     $image = drush_get_option('image', FALSE);
-    $size = drush_get_option('size', FALSE)
+    $size = drush_get_option('size', FALSE);
     if ($provider && $name && $image && $size) {
       vnodectrl_execute_command($command, $args, array($provider, $image, $size, $name));
     }
