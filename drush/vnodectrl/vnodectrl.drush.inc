@@ -65,7 +65,8 @@ function drush_vnodectrl_exec() {
 
 function drush_vnodectrl_provision_exec() {
   $args = func_get_args();
-  $command = substr(drush_get_command(), strlen('provision-'));
+  $command = drush_get_command();
+  $command = substr($command['command'], strlen('provision-'));
   if ($command == 'create-node') {
     $provider = drush_get_option('provider', FALSE);
     $name = drush_get_option('name', FALSE);
