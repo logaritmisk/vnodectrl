@@ -76,7 +76,7 @@ function drush_vnodectrl_provision_exec() {
       return vnodectrl_execute_command($command, $args, array($provider, $image, $size, $name));
     }
     else {
-      drush_error('The required options were not provided.');
+      drush_set_error('vnodectrl-missing-options', 'The required options were not provided.');
       return FALSE;
     }
   }
