@@ -5,119 +5,57 @@
  * @file
  * Main module file for the vnodectrl aegir frontend.
  */
-
-function vnodectrl_node_info() {
-  return array(
-    'vnodectrl_instance' => array(
-      'name' => t('Cloud server instance'),
-      'module' => 'vnodectrl',
-      'description' => t("A cloud server instance running on a provider supported by libcloud."),
-      'has_title' => TRUE,
-      'title_label' => t('Instance title'),
-      'has_body' => FALSE,
-    )
-  );
-}
-
-function vnodectrl_access($op, $node, $account) {
-  if ($op == 'create') {
-    return user_access('create vnodectrl_instance content', $account);
-  }
-
-  if ($op == 'update') {
-    if (user_access('edit any vnodectrl_instance content', $account) || (user_access('edit own vnodecltr_instance content', $account) && ($account->uid == $node->uid))) {
-      return TRUE;
-    }
-  }
-
-  if ($op == 'delete') {
-    if (user_access('delete any vnodectrl_instance content', $account) || (user_access('delete own vnodectrl_instance content', $account) && ($account->uid == $node->uid))) {
-      return TRUE;
-    }
-  }
-}
-
-function vnodectrl_perm() {
-  return array(
-    'create vnodectrl content',
-    'delete own vnodectrl content',
-    'delete any vnodectrl content',
-    'edit own vnodectrl content',
-    'edit any vnodectrl content',
-  );
-}
-
-function vnodectrl_form(&$node, $form_state) {
-  // The site admin can decide if this node type has a title and body, and how
-  // the fields should be labeled. We need to load these settings so we can
-  // build the node form correctly.
-  $type = node_get_types('type', $node);
-  if ($type->has_title) {
-    $form['title'] = array(
-      '#type' => 'textfield',
-      '#title' => check_plain($type->title_label),
+function vnodectrl_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'server_node_form') {
+    $form['provider'] = array(
+      '#type' => 'select',
+      '#title' => t('Provider'),
       '#required' => TRUE,
-      '#default_value' => $node->title,
-      '#weight' => -5
+      '#options' => vnodectrl_get_providers(),
+    );
+    $form['image'] = array(
+    	'#type' => 'select',
+      '#title' => t('Image'),
+      '#required' => TRUE,
+      '#options' => vnodectrl_get_images($node->provider),
+    );
+    $form['size'] = array(
+      '#type' => 'select',
+      '#title' => t('Size'),
+      '#required' => TRUE,
+      '#options' => vnodectrl_get_sizes($node->provider),
     );
   }
+}
 
-  if ($type->has_body) {
-    // In Drupal 6, we use node_body_field() to get the body and filter
-    // elements. This replaces the old textarea + filter_form() method of
-    // setting this up. It will also ensure the teaser splitter gets set up
-    // properly.
-    $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
+function vnodectrl_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  $function = 'vnodectrl_' . $op;
+  if (function_exists($function)) {
+    return $function($node);
+
   }
-  $form['provider'] = array(
-    '#type' => 'select',
-    '#title' => t('Provider'),
-    '#required' => TRUE,
-    '#options' => vnodectrl_get_providers(),
-  );
-  $form['image'] = array(
-  	'#type' => 'select',
-    '#title' => t('Image'),
-    '#required' => TRUE,
-    '#options' => vnodectrl_get_images($node->provider),
-  );
-  $form['size'] = array(
-    '#type' => 'select',
-    '#title' => t('Size'),
-    '#required' => TRUE,
-    '#options' => vnodectrl_get_sizes($node->provider),
-  );
-  $form['name'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Instance name'),
-    '#default_value' => check_plain($node->title),
-    '#required' => TRUE,
-    '#description' => t('A machine-readable name for this vnodectrl instance. This name may contain only lower case letters, _ and numbers.'),
-  );
-  return $form;
 }
 
-function vnodectrl_validate($node, &$form) {
+function vnodectrl_validate($node) {
   // @todo validate machine name
-
 }
 
-function vnodectrl_insert($node) {
+function vnodectrl_insert(&$node) {
   drupal_write_record('vnodectrl_instance', $node);
 }
 
-function vnodectrl_update($node) {
-  // Save a new node if we are adding a revision.
-  if ($node->revision) {
-    vnodectrl_insert($node);
-  }
-  else {
-    db_query("UPDATE vnodectrl_instance SET provider = '%s', name = '%s', image = '%s', size = '%s' WHERE nid = %d AND vid = %d", $node->nid, $node->vid);
-  }
+function vnodectrl_update(&$node) {
+  db_query("UPDATE vnodectrl_instance SET provider = '%s', name = '%s', image = '%s', size = '%s' WHERE nid = %d AND vid = %d",
+  $node->provider,
+  $node->title,
+  $node->image,
+  $node->size,
+  $node->nid,
+  $node->vid);
 }
 
-function vnodectrl_load($node) {
-  return db_fetch_object(db_query("SELECT provider, name, image, size FROM {vnodectrl_instance} WHERE nid = %d AND vid = %d", $node->nid, $node->vid));
+function vnodectrl_load(&$node) {
+  return db_fetch_array(db_query("SELECT provider, name, image, size FROM {vnodectrl_instance} WHERE nid = %d AND vid = %d", $node->nid, $node->vid));
 }
 
 /**
@@ -158,58 +96,16 @@ function vnodectrl_get_providers() {
 }
 
 /**
-* Implementation of hook_view().
-*/
-function vnodectrl_view(&$node, $teaser = false) {
-  hosting_set_breadcrumb($node);
-  modalframe_parent_js();
-  $node->content['info']['#prefix'] = '<div id="vnodectrl-instance-info">';
-  $node->content['info']['provider'] = array(
-    '#type' => 'item',
-    '#title' => t('Provider'),
-    '#value' => check_plain($node->provider),
-  );
-  $node->content['info']['image'] = array(
-    '#type' => 'item',
-    '#title' => t('Install profile'),
-    '#value' => check_plain($node->image),
-  );
-  $node->content['info']['size'] = array(
-   '#type' => 'item',
-   '#title' => t('Size'),
-   '#value' => check_plain($node->size),
-  );
-  hosting_ip_view($node);
-  $node->content['info']['#suffix'] = '</div>';
-  if ($node->nid) {
-    $node->content['tasks_view'] = array(
-      '#type' => 'item',
-      '#value' => hosting_task_table($node),
-      '#prefix' => '<div id="hosting-task-list">',
-      '#suffix' => '</div>',
-      '#weight' => 10
-    );
-    $settings['hostingTaskRefresh'] = array(
-      'nid' => $node->nid,
-      'changed' => $node->changed,
-    );
-    drupal_add_js($settings, 'setting');
-    drupal_add_js(drupal_get_path('module','hosting_task') . '/hosting_task.js');
-  }
-  return $node;
-}
-
-/**
  * Implementation of hook_hosting_tasks().
  */
 function vnodectrl_hosting_tasks() {
   $tasks = array();
-  $tasks['vnodectrl_instance']['vnodectrl_instance'] = array(
+  $tasks['server']['create-node'] = array(
     'title' => t('Create'),
     'description' => t('Create the instance.'),
     'access callback' => 'vnodectrl_task_access'
   );
-  $tasks['vnodectrl_instance']['delete'] = array(
+  $tasks['server']['delete-node'] = array(
     'title' => t('Delete'),
     'description' => t('Delete the instance.'),
   	'access callback' => 'vnodectrl_task_access'

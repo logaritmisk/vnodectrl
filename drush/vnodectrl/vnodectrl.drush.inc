@@ -43,8 +43,12 @@ function vnodectrl_drush_command() {
     }
     $item['bootstrap'] = DRUSH_BOOTSTRAP_DRUSH;
     $item['callback'] = 'drush_vnodectrl_exec';
-    $items[$command->command] = $item;
   }
+  $items['provision-vnodectrl'] = array(
+    'description' => 'Provision new cloud instances.',
+    'bootstrap' => DRUSH_BOOTSTRAP_DRUSH,
+    'arguments' => $operation,
+  );
   return $items;
 }
 
