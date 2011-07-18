@@ -4,10 +4,6 @@
  * This file contains some utility functions for dealing with vnodectrl stuff.
  */
 
-// Temporary solution! When we have an installation script in place for vnodectrl, it will be in our
-// path.
-define('VNODECTRL', 'python /home/fabsor/projects/vnodectrl/src/vnodectrl.py');
-
 /**
  * Fetch vnodectrl configuration.
  */
@@ -47,7 +43,7 @@ function vnodectrl_get_deploy_config($path = FALSE) {
  */
 function vnodectrl_get_commands() {
   // Execute the vnodectrl list
-  $result = drush_shell_exec(VNODECTRL . ' list-plugins');
+  $result = drush_shell_exec('vnodectrl list-plugins');
   if ($result) {
     $commands = json_decode(implode("\n", drush_shell_exec_output()));
   }
@@ -69,7 +65,7 @@ function vnodectrl_get_commands() {
  */
 function vnodectrl_execute_command($command, &$output, $args = array(), $options = array()) {
   $args = implode(' ', $args);
-  $result = drush_shell_exec(VNODECTRL . ' ' . $command . ' ' . $args);
+  $result = drush_shell_exec('vnodectrl ' . $command . ' ' . $args);
   $output = drush_shell_exec_output();
   return $result;
 }
