@@ -14,7 +14,7 @@ function vnodectrl_form_alter(&$form, $form_state, $form_id) {
       '#options' => vnodectrl_get_providers(),
     );
     $form['image'] = array(
-    	'#type' => 'select',
+      '#type' => 'select',
       '#title' => t('Image'),
       '#required' => TRUE,
       '#options' => vnodectrl_get_images($node->provider),

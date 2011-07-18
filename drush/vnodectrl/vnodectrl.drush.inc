@@ -43,12 +43,11 @@ function vnodectrl_drush_command() {
     }
     $item['bootstrap'] = DRUSH_BOOTSTRAP_DRUSH;
     $item['callback'] = 'drush_vnodectrl_exec';
+    $items[$command->command] = $item;
+    $item['callback'] = 'drush_vnodectrl_provision_exec';
+    $items['provision-' . $command->command] = $item;
+    unset($item['arguments']);
   }
-  $items['provision-vnodectrl'] = array(
-    'description' => 'Provision new cloud instances.',
-    'bootstrap' => DRUSH_BOOTSTRAP_DRUSH,
-    'arguments' => $operation,
-  );
   return $items;
 }
 
@@ -59,8 +58,23 @@ function drush_vnodectrl_exec() {
   $args = func_get_args();
   $command = drush_get_command();
   $output = array();
-  $result = vnodectrl_execute_command($command['command'], $output);
+  $result = vnodectrl_execute_command($command['command'], $output, $args);
   drush_print(implode("\n", $output));
   return $result;
 }
+
+function drush_vnodectrl_provision_exec() {
+  $args = func_get_args();
+  $command = substr(drush_get_command(), strlen('provision-'));
+  if ($command == 'create-node') {
+    $provider = drush_get_option('provider', FALSE);
+    $name = drush_get_option('name', FALSE);
+    $image = drush_get_option('image', FALSE);
+    $size = drush_get_option('size', FALSE)
+    if ($provider && $name && $image && $size) {
+      vnodectrl_execute_command($command, $args, array($provider, $image, $size, $name));
+    }
+  }
+}
+
 
