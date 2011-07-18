@@ -4,7 +4,6 @@
 /**
  * @file
  * Main module file for the vnodectrl aegir frontend.
- *
  */
 
 function vnodectrl_node_info() {
@@ -78,7 +77,7 @@ function vnodectrl_form(&$node, $form_state) {
   );
   $form['image'] = array(
   	'#type' => 'select',
-    '#title' => t('Provider'),
+    '#title' => t('Image'),
     '#required' => TRUE,
     '#options' => vnodectrl_get_images($node->provider),
   );
@@ -156,4 +155,72 @@ function vnodectrl_get_providers() {
   return array(
     'ec2-europe',
   );
+}
+
+/**
+* Implementation of hook_view().
+*/
+function vnodectrl_view(&$node, $teaser = false) {
+  hosting_set_breadcrumb($node);
+  modalframe_parent_js();
+  $node->content['info']['#prefix'] = '<div id="vnodectrl-instance-info">';
+  $node->content['info']['provider'] = array(
+    '#type' => 'item',
+    '#title' => t('Provider'),
+    '#value' => check_plain($node->provider),
+  );
+  $node->content['info']['image'] = array(
+    '#type' => 'item',
+    '#title' => t('Install profile'),
+    '#value' => check_plain($node->image),
+  );
+  $node->content['info']['size'] = array(
+   '#type' => 'item',
+   '#title' => t('Size'),
+   '#value' => check_plain($node->size),
+  );
+  hosting_ip_view($node);
+  $node->content['info']['#suffix'] = '</div>';
+  if ($node->nid) {
+    $node->content['tasks_view'] = array(
+      '#type' => 'item',
+      '#value' => hosting_task_table($node),
+      '#prefix' => '<div id="hosting-task-list">',
+      '#suffix' => '</div>',
+      '#weight' => 10
+    );
+    $settings['hostingTaskRefresh'] = array(
+      'nid' => $node->nid,
+      'changed' => $node->changed,
+    );
+    drupal_add_js($settings, 'setting');
+    drupal_add_js(drupal_get_path('module','hosting_task') . '/hosting_task.js');
+  }
+  return $node;
+}
+
+/**
+ * Implementation of hook_hosting_tasks().
+ */
+function vnodectrl_hosting_tasks() {
+  $tasks = array();
+  $tasks['vnodectrl_instance']['vnodectrl_instance'] = array(
+    'title' => t('Create'),
+    'description' => t('Create the instance.'),
+    'access callback' => 'vnodectrl_task_access'
+  );
+  $tasks['vnodectrl_instance']['delete'] = array(
+    'title' => t('Delete'),
+    'description' => t('Delete the instance.'),
+  	'access callback' => 'vnodectrl_task_access'
+  );
+  $tasks['vnodectrl_image']['list'] = array(
+    'title' => t('List'),
+    'hidden' => TRUE,
+  );
+  return $tasks;
+}
+
+function vnodectrl_task_access($node, $task) {
+  return TRUE;
 }
