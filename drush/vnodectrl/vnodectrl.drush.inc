@@ -75,6 +75,9 @@ function drush_vnodectrl_provision_exec() {
     if ($provider && $name && $image && $size) {
       vnodectrl_execute_command($command, $args, array($provider, $image, $size, $name));
     }
+    else {
+      drush_print('The required options were not provided.');
+    }
   }
 }
 
