@@ -21,7 +21,7 @@ def main(args):
 
     # Get all commands.
     commands = utils.get_commands()
-    if len(args) > 0:
+    if len(args) > 1:
         primary_command = args[1];
         command_info = commands.get(primary_command, None);
         if command_info != None:
