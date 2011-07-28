@@ -21,17 +21,18 @@ def main(args):
 
     # Get all commands.
     commands = utils.get_commands()
-
-    parser = OptionParser()
-    (options, args) = parser.parse_args()
-
     if len(args) > 0:
-        primary_command = args[0];
+        primary_command = args[1];
         command_info = commands.get(primary_command, None);
         if command_info != None:
+            parser = OptionParser()
+            if "options" in command_info:
+                for option_name, option in command_info["options"].iteritems():
+                    parser.add_option(option["option"], action="store", type="string", default=option["default"])
+            (options, command_args) = parser.parse_args() 
             plugin_class = getattr(command_info['module'], command_info['plugin'])
             plugin = plugin_class(configuration)
-            plugin.execute(primary_command, args, options)
+            plugin.execute(primary_command, command_args, options)
         else:
             print "Unrecognized command"
 
