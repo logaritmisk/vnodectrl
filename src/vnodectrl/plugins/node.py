@@ -1,6 +1,7 @@
 from vnodectrl.base import VnodectrlPlugin
 from vnodectrl.base import libcloud_requirements
 import sys; sys.path.append('..')
+import json
 from vnodectrl import utils
 from vnodectrl import base
 
@@ -15,7 +16,14 @@ COMMANDS = {
 			"image" : "The image to use for this instance. For a list of images, use vnodectrl list-images.",
 			"size" : "The size of the instance you want to create.",
 			"name" : "The name of the image to create."
-		}
+		},
+		"options": {
+			"format": {
+				"option": "--format",
+				"default": "default",
+				"description": "The format to output the data in. valid ones are:\njson\ndefault"
+			}
+		}					
 	},
 	"destroy-node": {
 		"description": "Destroy node",
@@ -26,6 +34,13 @@ COMMANDS = {
 			"provider" : "The provider of the node.",
 			"node": "The ID of the node."
 		}
+	},
+	"options": {
+		"format": {
+			"option": "--format",
+			"default": "default",
+			"description": "The format to output the data in. valid ones are:\njson\ndefault"
+		}
 	}
 }
 
@@ -34,14 +49,15 @@ class NodeCreatePlugin(VnodectrlPlugin):
 		self.config = config
 		
 	def execute(self, cmd, args, options):
+		self.format = options.format
 		if len(args) < 5:
-			print "You must specify your provider and an image to use."
-			return False
+			self.printError("You must specify your provider and an image to use.")
+			return self.finalize()
 		
 		driver = args[1]
 		if base.get_provider(driver) == False:
-			print "The provider you specified doesn't exist"
-			return False
+			return self.printError("The provider you specified doesn't exist")
+			
 		
 		image = args[2]
 		size = args[3]
@@ -49,27 +65,48 @@ class NodeCreatePlugin(VnodectrlPlugin):
 		settings = self.config["drivers"].get(args[1], False)
 		
 		if settings == False:
-			print "You have no configuration for the driver you specified in your configuration file"
-			return False
+			return self.printError("You have no configuration for the driver you specified in your configuration file")
 		try:
 			conn = self.connect(driver, settings["id"], settings["key"])
 			size = self.getSize(driver, conn, size)
 			if size == False:
-				print "The size you specified does not exist. Please select a valid size"
+				return self.printError("The size you specified does not exist. Please select a valid size")
 			image = self.getImage(driver, conn, image)
 			if image == False:
-				print "The image you selected does not exist."
-			print "Selected size: {0} ({1})\nSelected image: {2} ({3})".format(size.id, size.name, image.id, image.name)
-			print "Creating node..."
+				return self.printError("The image you selected does not exist.")
+			self.printMessage("Selected size: {0} ({1})\nSelected image: {2} ({3})".format(size.id, size.name, image.id, image.name))
+			self.printMessage("Creating node...")
 			node = conn.create_node(name=name, image=image, size=size)
-			print node
+			self.printMessage(node)
+			self.printNode(node)
 		except NameError, e:
-			print ">> Fatal Error: %s" % e
-			print "   (Hint: modify secrets.py.dist)"
-			return False
+			return self.printError(">> Fatal Error: %s" % e)
 		except Exception, e:
-			print ">> Fatal error: %s" % e
-			return False
+			return self.printError(">> Fatal error: %s" % e)
+		
+	def printError(self, error):
+		if self.format == 'json':
+			print json.dumps({'status': 'error', 'message': error});
+		else:
+			print error
+		return False;
+	def printMessage(self, message):
+		if self.format == 'json':
+			return
+		print message
+	def printNode(self, node):
+		if self.format == 'json':
+			json_node = {
+				"id": node.id,
+				"name": node.name,
+				"extra": node.extra
+			}
+			print json.dumps(json_node)
+		else:
+			print "{0}: {1}".format(node.id, node.name)
+			print "extra:"
+			for key, value in node.extra.iteritems():
+				print "{0}: {1}".format(key, value)
 
 class NodeDestroyPlugin(VnodectrlPlugin):
 	def __init__(self, config):

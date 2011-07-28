@@ -1,5 +1,6 @@
 import sys; sys.path.append('..')
 import utils
+import json
 try:
 	from libcloud.compute.types import Provider
 	from libcloud.compute.providers import get_driver
@@ -91,8 +92,8 @@ class VnodectrlPlugin:
 		for available_node in nodes:
 			if available_node.name == node:
 				return available_node
-		return False		
-
+		return False
+			
 class VnodectrlException(Exception):
 	def __init__(self, value):
 		self.value = value
