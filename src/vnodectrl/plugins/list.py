@@ -47,10 +47,11 @@ class ListPlugin(VnodectrlPlugin):
 			if args.count(driver) > 0 or len(args) == 1:
 				try:
 					conn = self.connect(driver, settings["id"], settings["key"])
-					if cmd == "list-nodes":
-						data[driver] = self.listNodes(conn, options.format)
-					elif cmd == "list-images":
-						data[driver] = self.listImages(conn, options.format)						
+					if conn:
+						if cmd == "list-nodes":
+							data[driver] = self.listNodes(conn, options.format)
+						elif cmd == "list-images":
+							data[driver] = self.listImages(conn, options.format)						
 				except NameError, e:
 					print ">> Fatal Error: %s" % e
 					return 1
