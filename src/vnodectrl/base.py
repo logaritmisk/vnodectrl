@@ -3,6 +3,8 @@ import utils
 try:
 	from libcloud.compute.types import Provider
 	from libcloud.compute.providers import get_driver
+	import libcloud.security
+   	libcloud.security.VERIFY_SSL_CERT = True
 except ImportError:
 	'''
 	'''
