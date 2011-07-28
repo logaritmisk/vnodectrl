@@ -42,33 +42,47 @@ class ListPlugin(VnodectrlPlugin):
 		self.config = config;
 		
 	def execute(self, cmd, args, options):
+		data = {}
 		for driver,settings in self.config["drivers"].iteritems():
 			if args.count(driver) > 0 or len(args) == 1:
 				try:
 					conn = self.connect(driver, settings["id"], settings["key"])
 					if cmd == "list-nodes":
-						self.listNodes(conn, options.format)
+						data[driver] = self.listNodes(conn, options.format)
 					elif cmd == "list-images":
-						self.listImages(conn, options.format)
+						data[driver] = self.listImages(conn, options.format)						
 				except NameError, e:
 					print ">> Fatal Error: %s" % e
-					print "   (Hint: modify secrets.py.dist)"
 					return 1
 				except Exception, e:
 					print ">> Fatal error: %s" % e
 					return 1
+		if options.format == 'json':
+			print json.dumps(data)
+		else:
+			for driver, images in data:
+				print ('{0}:').format(driver)
+				for image in images:
+					print "\t{0}".format(image)
+			
 	def listNodes(self, conn, format='default'):
 		nodes = conn.list_nodes()
+		node_list = []
 		for node in nodes:
-			print "name: {0}\t id: {1}\t IP: {2}\t".format(node.name, node.id, node.public_ip)
+			if format == 'json':
+				for image in images:
+					node_list.append({'name': image.name, 'id': image.id})
+			else:
+				node_list.append("name: {0}\t id: {1}\t IP: {2}\t".format(node.name, node.id, node.public_ip))
+		return node_list
 	
 	def listImages(self, conn, format='default'):
 		images = conn.list_images()
-		if format == 'default':
+		image_list = []
+		if format == 'json':
 			for image in images:
-				print "name: {0}\t id: {1}".format(image.name, image.id)
-		elif format == 'json':
-			json_images = []
+				image_list.append({'name': image.name, 'id': image.id})
+		else:
 			for image in images:
-				json_images.append({'name': image.name, 'id': image.id})
-			print json.dumps(json_images)
+				image_list.append("name: {0}\t id: {1}".format(image.name, image.id))
+		return image_list
