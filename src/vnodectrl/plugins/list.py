@@ -60,10 +60,10 @@ class ListPlugin(VnodectrlPlugin):
 		if options.format == 'json':
 			print json.dumps(data)
 		else:
-			for driver, images in data:
+			for driver, content in data.iteritems():
 				print ('{0}:').format(driver)
-				for image in images:
-					print "\t{0}".format(image)
+				for item in content:
+					print "\t{0}".format(content)
 			
 	def listNodes(self, conn, format='default'):
 		nodes = conn.list_nodes()
