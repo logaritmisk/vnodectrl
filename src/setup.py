@@ -2,10 +2,14 @@
 
 from distutils.core import setup
 from shutil import copyfile
+import os.path
 
-# Create a vnodectrl.conf file out of the
-# vnodectrl.conf.dist file.
-copyfile('vnodectrl.conf.dist', 'vnodectrl.conf')
+files = []
+if not os.path.isfile('/etc/vnodectrl/vnodectrl.conf'):
+    # Create a vnodectrl.conf file out of the
+    # vnodectrl.conf.dist file.
+    copyfile('vnodectrl.conf.dist', 'vnodectrl.conf')
+    files.append(('/etc/vnodectrl', ['vnodectrl.conf']))
 
 setup(name='vnodectrl',
       version='3.0',
@@ -18,5 +22,5 @@ setup(name='vnodectrl',
       # This configuration file will be used for users
       # that don't have their own configuration in their .vnodectrl
       # folder.
-      data_files=[('/etc/vnodectrl', ['vnodectrl.conf'])]
+      data_files=files
 )
