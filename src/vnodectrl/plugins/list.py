@@ -2,7 +2,6 @@ from vnodectrl.base import VnodectrlPlugin, libcloud_requirements
 from vnodectrl.base import libcloud_requirements
 import sys; sys.path.append('..')
 import json
-
 COMMANDS = {
 	"list-nodes" : {
 		"description": "List nodes",
@@ -64,7 +63,7 @@ class ListPlugin(VnodectrlPlugin):
 			for driver, content in data.iteritems():
 				print ('{0}:').format(driver)
 				for item in content:
-					print "\t{0}".format(content)
+					print "\t{0}".format(item)
 			
 	def listNodes(self, conn, format='default'):
 		nodes = conn.list_nodes()
