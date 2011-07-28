@@ -7,9 +7,9 @@
 /**
  * Implementation of hook_schema().
  */
-function vnodectrl_schema() {
+function hosting_vnodectrl_schema() {
   // We store information about instances we have created here.
-  $schema['vnodectrl_instance'] = array(
+  $schema['hosting_vnodectrl_instance'] = array(
     'fields' => array(
       'vid' => array(
         'type' => 'int',
@@ -47,7 +47,7 @@ function vnodectrl_schema() {
     'primary key' => array('vid', 'nid'),
   );
   // We store available images here.
-  $schema['vnodectrl_images'] = array(
+  $schema['hosting_vnodectrl_images'] = array(
     'fields' => array(
       'iid' => array(
         'type' => 'serial',
@@ -79,11 +79,11 @@ function vnodectrl_schema() {
 /**
  * Implementation of hook_install().
  */
-function vnodectrl_install() {
+function hosting_vnodectrl_install() {
   // Create tables.
-  drupal_install_schema('vnodectrl');
+  drupal_install_schema('hosting_vnodectrl');
 }
 
-function vnodectrl_uninstall() {
-  drupal_uninstall_schema('vnodectrl');
+function hosting_vnodectrl_uninstall() {
+  drupal_uninstall_schema('hosting_vnodectrl');
 }

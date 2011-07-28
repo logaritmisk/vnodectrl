@@ -3,49 +3,49 @@
 
 /**
  * @file
- * Main module file for the vnodectrl aegir frontend.
+ * Main module file for the hosting_vnodectrl aegir frontend.
  */
-function vnodectrl_form_alter(&$form, $form_state, $form_id) {
+function hosting_vnodectrl_form_alter(&$form, $form_state, $form_id) {
   if ($form_id == 'server_node_form') {
     $form['provider'] = array(
       '#type' => 'select',
       '#title' => t('Provider'),
       '#required' => TRUE,
-      '#options' => vnodectrl_get_providers(),
+      '#options' => hosting_vnodectrl_get_providers(),
     );
     $form['image'] = array(
       '#type' => 'select',
       '#title' => t('Image'),
       '#required' => TRUE,
-      '#options' => vnodectrl_get_images($node->provider),
+      '#options' => hosting_vnodectrl_get_images($node->provider),
     );
     $form['size'] = array(
       '#type' => 'select',
       '#title' => t('Size'),
       '#required' => TRUE,
-      '#options' => vnodectrl_get_sizes($node->provider),
+      '#options' => hosting_vnodectrl_get_sizes($node->provider),
     );
   }
 }
 
-function vnodectrl_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
-  $function = 'vnodectrl_' . $op;
+function hosting_vnodectrl_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  $function = 'hosting_vnodectrl_' . $op;
   if (function_exists($function)) {
     return $function($node);
 
   }
 }
 
-function vnodectrl_validate($node) {
+function hosting_vnodectrl_validate($node) {
   // @todo validate machine name
 }
 
-function vnodectrl_insert(&$node) {
-  drupal_write_record('vnodectrl_instance', $node);
+function hosting_vnodectrl_insert(&$node) {
+  drupal_write_record('hosting_vnodectrl_instance', $node);
 }
 
-function vnodectrl_update(&$node) {
-  db_query("UPDATE vnodectrl_instance SET provider = '%s', name = '%s', image = '%s', size = '%s' WHERE nid = %d AND vid = %d",
+function hosting_vnodectrl_update(&$node) {
+  db_query("UPDATE hosting_vnodectrl_instance SET provider = '%s', name = '%s', image = '%s', size = '%s' WHERE nid = %d AND vid = %d",
   $node->provider,
   $node->title,
   $node->image,
@@ -54,22 +54,22 @@ function vnodectrl_update(&$node) {
   $node->vid);
 }
 
-function vnodectrl_load(&$node) {
-  return db_fetch_array(db_query("SELECT provider, name, image, size FROM {vnodectrl_instance} WHERE nid = %d AND vid = %d", $node->nid, $node->vid));
+function hosting_vnodectrl_load(&$node) {
+  return db_fetch_array(db_query("SELECT provider, name, image, size FROM {hosting_vnodectrl_instance} WHERE nid = %d AND vid = %d", $node->nid, $node->vid));
 }
 
 /**
  * Get a list of images available from the given provider.
  */
-function vnodectrl_get_images() {
+function hosting_vnodectrl_get_images() {
   return array('fake' => 'fake');
 }
 
 /**
  * Get a list of available images for a particular provider.
  */
-function vnodectrl_get_sizes($provider) {
-  // @todo Actually fetch this through vnodectrl.
+function hosting_vnodectrl_get_sizes($provider) {
+  // @todo Actually fetch this through hosting_vnodectrl.
   return array(
     't1.micro' => 'Micro Instance',
     'm1.small' => 'Small Instance',
@@ -88,8 +88,8 @@ function vnodectrl_get_sizes($provider) {
 /**
  * Get a list of available providers.
  */
-function vnodectrl_get_providers() {
-  // @todo Actually fetch this from vnodectrl.
+function hosting_vnodectrl_get_providers() {
+  // @todo Actually fetch this from hosting_vnodectrl.
   return array(
     'ec2-europe',
   );
@@ -98,25 +98,25 @@ function vnodectrl_get_providers() {
 /**
  * Implementation of hook_hosting_tasks().
  */
-function vnodectrl_hosting_tasks() {
+function hosting_vnodectrl_hosting_tasks() {
   $tasks = array();
   $tasks['server']['create-node'] = array(
     'title' => t('Create'),
     'description' => t('Create the instance.'),
-    'access callback' => 'vnodectrl_task_access'
+    'access callback' => 'hosting_vnodectrl_task_access'
   );
   $tasks['server']['delete-node'] = array(
     'title' => t('Delete'),
     'description' => t('Delete the instance.'),
-  	'access callback' => 'vnodectrl_task_access'
+  	'access callback' => 'hosting_vnodectrl_task_access'
   );
-  $tasks['vnodectrl_image']['list'] = array(
+  $tasks['hosting_vnodectrl_image']['list'] = array(
     'title' => t('List'),
     'hidden' => TRUE,
   );
   return $tasks;
 }
 
-function vnodectrl_task_access($node, $task) {
+function hosting_vnodectrl_task_access($node, $task) {
   return TRUE;
 }
