@@ -32,7 +32,7 @@ def main(args):
             (options, command_args) = parser.parse_args() 
             plugin_class = getattr(command_info['module'], command_info['plugin'])
             plugin = plugin_class(configuration)
-            plugin.execute(primary_command, command_args, options)
+            return plugin.execute(primary_command, command_args, options)
         else:
             print "Unrecognized command"
 
