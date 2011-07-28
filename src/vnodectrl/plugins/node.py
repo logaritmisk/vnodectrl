@@ -2,6 +2,7 @@ from vnodectrl.base import VnodectrlPlugin
 from vnodectrl.base import libcloud_requirements
 import sys; sys.path.append('..')
 from vnodectrl import utils
+from vnodectrl import base
 
 COMMANDS = {
 	"create-node" : {
@@ -38,7 +39,7 @@ class NodeCreatePlugin(VnodectrlPlugin):
 			return False
 		
 		driver = args[1]
-		if utils.get_provider(driver) == False:
+		if base.get_provider(driver) == False:
 			print "The provider you specified doesn't exist"
 			return False
 		
@@ -52,10 +53,10 @@ class NodeCreatePlugin(VnodectrlPlugin):
 			return False
 		try:
 			conn = self.connect(driver, settings["id"], settings["key"])
-			size = self.getSize(conn, size)
+			size = self.getSize(driver, conn, size)
 			if size == False:
 				print "The size you specified does not exist. Please select a valid size"
-			image = self.getImage(conn, image)
+			image = self.getImage(driver, conn, image)
 			if image == False:
 				print "The image you selected does not exist."
 			print "Selected size: {0} ({1})\nSelected image: {2} ({3})".format(size.id, size.name, image.id, image.name)
