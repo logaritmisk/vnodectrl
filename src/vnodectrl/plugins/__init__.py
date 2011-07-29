@@ -1,1 +1,1 @@
-__all__ = ["config", "list", "node", "deploy", "dnstools", "plugininfo"]
+__all__ = ["config", "list", "node", "deploy", "dnstools", "plugininfo", "sshtools"]

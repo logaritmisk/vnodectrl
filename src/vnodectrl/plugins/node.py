@@ -4,6 +4,7 @@ import sys; sys.path.append('..')
 import json
 from vnodectrl import utils
 from vnodectrl import base
+from dns.rdatatype import NULL
 
 COMMANDS = {
 	"create-node" : {
@@ -22,7 +23,17 @@ COMMANDS = {
 				"option": "--format",
 				"default": "default",
 				"description": "The format to output the data in. valid ones are:\njson\ndefault"
-			}
+			},
+			"ec2_securitygroup": {
+				"option": "--ec2-securitygroup",
+				"default": None,
+				"description": "The EC2 Security group this node should belong to. This is only applicable for EC2"
+			},
+			"ec2_keypair": {
+				"option": "--ec2-keypair",
+				"default": None,
+				"description": "The EC2 keypair this node should belong to."
+			}				
 		}					
 	},
 	"destroy-node": {
@@ -93,7 +104,17 @@ class NodeCreatePlugin(VnodectrlPlugin):
 				return self.printError("The image you selected does not exist.")
 			self.printMessage("Selected size: {0} ({1})\nSelected image: {2} ({3})".format(size.id, size.name, image.id, image.name))
 			self.printMessage("Creating node...")
-			node = conn.create_node(name=name, image=image, size=size)
+			parameters = {
+				'name': name,
+				'image': image,
+				'size': size
+			}
+			if options.ec2_securitygroup is not None:
+				parameters["ex_securitygroup"] = options.ec2_securitygroup
+			if options.ec2_keypair is not None:
+				parameters["ex_keyname"] = options.ec2_keypair
+
+			node = conn.create_node(**parameters)
 			self.printMessage(node)
 			self.printNode(node)
 		except NameError, e:
