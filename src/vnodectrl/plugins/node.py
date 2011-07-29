@@ -33,13 +33,13 @@ COMMANDS = {
 		"arguments" : {
 			"provider" : "The provider of the node.",
 			"node": "The ID of the node."
-		}
-	},
-	"options": {
-		"format": {
-			"option": "--format",
-			"default": "default",
-			"description": "The format to output the data in. valid ones are:\njson\ndefault"
+		},
+		"options": {
+			"format": {
+				"option": "--format",
+				"default": "default",
+				"description": "The format to output the data in. valid ones are:\njson\ndefault"
+			}
 		}
 	}
 }
