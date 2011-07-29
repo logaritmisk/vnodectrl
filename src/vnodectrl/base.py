@@ -119,10 +119,10 @@ class VnodectrlPlugin:
 		if self.format == 'json':
 			json_result = {
 				'status': 'ok',
-				'private_ips': node.private_ip,
-				'public_ips': node.public_ip,
 				'node': {
 					'id': node.id,
+					'private_ips': node.private_ip,
+					'public_ips': node.public_ip,
 					'name': node.name,
 					'extra': node.extra
 				}
