@@ -96,10 +96,13 @@ class NodeCreatePlugin(VnodectrlPlugin):
 		print message
 	def printNode(self, node):
 		if self.format == 'json':
-			json_node = {
-				"id": node.id,
-				"name": node.name,
-				"extra": node.extra
+			json_result = {
+				'status': 'ok',
+				'node': {
+					'id': node.id,
+					'name': node.name,
+					'extra': node.extra
+				}
 			}
 			print json.dumps(json_node)
 		else:
