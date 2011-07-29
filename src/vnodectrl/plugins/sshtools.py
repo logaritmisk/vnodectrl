@@ -1,5 +1,7 @@
 from vnodectrl.base import VnodectrlPlugin, libcloud_requirements
 from vnodectrl.base import libcloud_requirements
+from os.path import isfile
+from os import getenv
 import sys; sys.path.append('..')
 import json
 COMMANDS = {
@@ -20,10 +22,10 @@ COMMANDS = {
 			},
 		}
 	},
-	"ssh-security-group": {
-		"description": "Get the ssh security group",
+	"ssh-ec2-keyfile": {
+		"description": "Get the path to tge ssh key file if it's available for this user.",
 		"plugin": "SSHPlugin",
-		"name": "connection-string",
+		"name": "ssh-ec2-keypair",
 		"requirements": libcloud_requirements,
 		"arguments": {
 			"driver": "Driver",
@@ -45,8 +47,15 @@ class SSHPlugin(VnodectrlPlugin):
 		node = self.getNode(driver, conn, node)
 		if args[0] == 'ssh-connection-string':
 			return self.connectionString(node, options)
-		elif args[0] == 'ssh-security-group':
-			print node.extra['keyname']
+		elif args[0] == 'ssh-ec2-keyfile':
+			home_key_file = "{0}/.vnodectrl.d/3.x/keys/{1}.pem".format(getenv("HOME"), node.extra['keyname']);
+			global_key_file = "/etc/vnodectrl/keys/{0}.pem".format(node.extra['keyname']);
+			if isfile(home_key_file):
+				print home_key_file
+			elif isfile(global_key_file):
+				print global_key_file
+			else:
+				print "The key file is not present on this system."
 		
 	def connectionString(self, node, options):
 		"""
