@@ -104,7 +104,7 @@ class NodeCreatePlugin(VnodectrlPlugin):
 					'extra': node.extra
 				}
 			}
-			print json.dumps(json_node)
+			print json.dumps(json_result)
 		else:
 			print "{0}: {1}".format(node.id, node.name)
 			print "extra:"
