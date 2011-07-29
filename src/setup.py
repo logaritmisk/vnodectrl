@@ -18,7 +18,7 @@ setup(name='vnodectrl',
       author_email='anders@nodeone.se',
       url='http://github.com/logaritmisk/vnodectrl',
       packages=['vnodectrl', 'vnodectrl.plugins'],
-      scripts=['scripts/vnodectrl'],
+      scripts=['scripts/vnodectrl', 'scripts/vnodectrl-ec2-ssh'],
       # This configuration file will be used for users
       # that don't have their own configuration in their .vnodectrl
       # folder.
