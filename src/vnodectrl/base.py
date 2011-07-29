@@ -114,6 +114,31 @@ class VnodectrlPlugin:
 		else:
 			print message
 		return True
+	
+	def printNode(self, node):
+		if self.format == 'json':
+			json_result = {
+				'status': 'ok',
+				'private_ips': node.private_ip,
+				'public_ips': node.public_ip,
+				'node': {
+					'id': node.id,
+					'name': node.name,
+					'extra': node.extra
+				}
+			}
+			print json.dumps(json_result)
+		else:
+			print "{0}: {1}".format(node.id, node.name)
+			print "Private IP addresses:"
+			for ip in node.private_ip:
+				print "\t{0}".format(ip)
+			print "Public IP addresses:"
+			for ip in node.public_ip:
+				print "\t{0}".format(ip)
+			print "Extra:"
+			for key, value in node.extra.iteritems():
+				print "\t{0}: {1}".format(key, value)
 
 class VnodectrlException(Exception):
 	def __init__(self, value):

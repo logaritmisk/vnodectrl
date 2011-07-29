@@ -41,6 +41,23 @@ COMMANDS = {
 				"description": "The format to output the data in. valid ones are:\njson\ndefault"
 			}
 		}
+	},
+	"node-info": {
+		"description": "Get node information",
+		"plugin": "NodeInfoPlugin",
+		"name": "node-info",
+		"requirements": libcloud_requirements,
+		"arguments" : {
+			"provider" : "The provider of the node.",
+			"node": "The ID of the node."
+		},
+		"options": {
+			"format": {
+				"option": "--format",
+				"default": "default",
+				"description": "The format to output the data in. valid ones are:\njson\ndefault"
+			}
+		}		
 	}
 }
 
@@ -84,23 +101,6 @@ class NodeCreatePlugin(VnodectrlPlugin):
 		except Exception, e:
 			return self.printError(">> Fatal error: %s" % e)
 
-	def printNode(self, node):
-		if self.format == 'json':
-			json_result = {
-				'status': 'ok',
-				'node': {
-					'id': node.id,
-					'name': node.name,
-					'extra': node.extra
-				}
-			}
-			print json.dumps(json_result)
-		else:
-			print "{0}: {1}".format(node.id, node.name)
-			print "extra:"
-			for key, value in node.extra.iteritems():
-				print "{0}: {1}".format(key, value)
-
 class NodeDestroyPlugin(VnodectrlPlugin):
 	def __init__(self, config):
 		self.config = config
@@ -141,3 +141,33 @@ class NodeDestroyPlugin(VnodectrlPlugin):
 			if available_node.name == node:
 				return available_node
 		return False
+
+class NodeInfoPlugin(VnodectrlPlugin):
+	def __init__(self, config):
+		self.config = config
+
+	def execute(self, cmd, args, options):
+		self.format = options.format
+		if len(args) < 2:
+			return self.printError("You must specify your provider and the node id.")
+		
+		driver = args[1]
+		if base.get_provider(driver) == False:
+			return self.printError("The provider you specified doesn't exist")
+		
+		node = args[2]
+		settings = self.config["drivers"].get(args[1], False)
+		
+		if settings == False:
+			return self.printError("You have no configuration for the driver you specified in your configuration file")
+		
+		try:
+			conn = self.connect(driver, settings["id"], settings["key"])
+			actual_node = self.getNode(driver, conn, node)
+			if (actual_node == False):
+				return self.printError("The node you specified does not exist.")
+			self.printNode(actual_node)
+		except NameError, e:
+			return self.printError(">> Fatal Error: %s" % e)
+		except Exception, e:
+			return self.printError(">> Fatal error: %s" % e)
