@@ -17,6 +17,8 @@ class VnodectrlOptions:
 		"""
 
 class VnodectrlPlugin:
+	format = 'default'
+	
 	def commands(self):
 		"""
 		Declare all commands here.
@@ -93,7 +95,26 @@ class VnodectrlPlugin:
 			if available_node.name == node:
 				return available_node
 		return False
-			
+	
+	def printError(self, error):
+		if self.format == 'json':
+			print json.dumps({'status': 'error', 'message': error});
+		else:
+			print error
+		return False;
+
+	def printMessage(self, message):
+		if self.format == 'json':
+			return
+		print message
+	
+	def printSuccess(self, message):
+		if (self.format == 'json'):
+			print json.dumps({'status': 'ok', 'message': message});
+		else:
+			print message
+		return True
+
 class VnodectrlException(Exception):
 	def __init__(self, value):
 		self.value = value

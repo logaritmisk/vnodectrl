@@ -83,17 +83,7 @@ class NodeCreatePlugin(VnodectrlPlugin):
 			return self.printError(">> Fatal Error: %s" % e)
 		except Exception, e:
 			return self.printError(">> Fatal error: %s" % e)
-		
-	def printError(self, error):
-		if self.format == 'json':
-			print json.dumps({'status': 'error', 'message': error});
-		else:
-			print error
-		return False;
-	def printMessage(self, message):
-		if self.format == 'json':
-			return
-		print message
+
 	def printNode(self, node):
 		if self.format == 'json':
 			json_result = {
@@ -116,35 +106,31 @@ class NodeDestroyPlugin(VnodectrlPlugin):
 		self.config = config
 		
 	def execute(self, cmd, args, options):
+		self.format = options.format
 		if len(args) < 2:
-			print "You must specify your provider and the node id."
-			return False
+			return self.printError("You must specify your provider and the node id.")
 		
 		driver = args[1]
-		if utils.get_provider(driver) == False:
-			print "The provider you specified doesn't exist"
-			return False
+		if base.get_provider(driver) == False:
+			return self.printError("The provider you specified doesn't exist")
 		
 		node = args[2]
 		settings = self.config["drivers"].get(args[1], False)
 		
 		if settings == False:
-			print "You have no configuration for the driver you specified in your configuration file"
-			return False
+			return self.printError("You have no configuration for the driver you specified in your configuration file")
 		try:
 			conn = self.connect(driver, settings["id"], settings["key"])
 			actual_node = self.getNode(conn, node)
 			if (actual_node == False):
-				print "The node you specified does not exist."
-			print "Deleting node: {0}".format(actual_node.name)
+				self.printMessage("The node you specified does not exist.")
+			self.printMessage("Deleting node: {0}".format(actual_node.name))
 			conn.destroy_node(actual_node)
-			print "Node destroyed."
+			return self.printSuccess("Node destroyed");
 		except NameError, e:
-			print ">> Fatal Error: %s" % e
-			return False
+			return self.printError(">> Fatal Error: %s" % e)
 		except Exception, e:
-			print ">> Fatal error: %s" % e
-			return False
+			return self.printError(">> Fatal error: %s" % e)
 	
 	def getNode(self, conn, node):
 		# TODO: There are way more elegant ways
