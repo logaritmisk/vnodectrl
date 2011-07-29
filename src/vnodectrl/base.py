@@ -92,7 +92,7 @@ class VnodectrlPlugin:
 		# bothered to look them up atm.
 		nodes = conn.list_nodes()
 		for available_node in nodes:
-			if available_node.name == node:
+			if available_node.id == node:
 				return available_node
 		return False
 	
