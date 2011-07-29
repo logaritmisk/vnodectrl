@@ -123,7 +123,7 @@ class NodeDestroyPlugin(VnodectrlPlugin):
 			conn = self.connect(driver, settings["id"], settings["key"])
 			actual_node = self.getNode(conn, node)
 			if (actual_node == False):
-				self.printMessage("The node you specified does not exist.")
+				return self.printError("The node you specified does not exist.")
 			self.printMessage("Deleting node: {0}".format(actual_node.name))
 			conn.destroy_node(actual_node)
 			return self.printSuccess("Node destroyed");
