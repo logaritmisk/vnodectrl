@@ -14,15 +14,10 @@ COMMANDS = {
 		},
 	    "options": {
 			"remote_user": {
-				"option": "--remote-user",
+				"option": ["--remote-user"],
 				"default": "ubuntu",
 				"description": "The remote user that should be returned."
 			},
-			"interactive": {
-				"option": "--interactive",
-				"default": True,
-				"description": "Provide interactive help if necessary."
-			}
 		}
 	},
 	"ssh-ec2-keyfile": {
