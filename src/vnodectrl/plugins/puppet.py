@@ -50,7 +50,7 @@ class PuppetPlugin(VnodectrlPlugin):
 			if key:
 				puppet_args['key_filename'] = key
 		with fabric.api.settings(**puppet_args):
-			self.puppetConnect()
+			self.puppetConnect(master_ip)
 	
 	def puppetConnect(self, master_ip):
 		"""
