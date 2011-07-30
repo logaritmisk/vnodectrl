@@ -14,11 +14,10 @@ COMMANDS = {
 			"puppet": "The node to connect",
 			"master": "The master node"
 		},
-		"options": {
+		"flags": {
 			"interactive": {
-				"option": "--interactive",
-				"default": True,
-				"description": "Ask for arguments if they are missing."
+				"on": ['-i', '--interactive'],
+				"default": False
 			}
 		}
 	},

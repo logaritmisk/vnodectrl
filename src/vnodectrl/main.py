@@ -28,7 +28,17 @@ def main(args):
             parser = OptionParser()
             if "options" in command_info:
                 for option_name, option in command_info["options"].iteritems():
-                    parser.add_option(option["option"], action="store", type="string", default=option["default"])
+                    if "type" not in option:
+                        option['type'] = 'string'
+                    parser.add_option(*option["option"], action="store", type=option['type'], default=option["default"])
+                    parser.add_option(*option["option"], action="store", type=option['type'], default=option["default"])
+            if "flags" in command_info:
+                for flag_name, flag_option in command_info["flags"].iteritems():
+                    if 'on' in flag_option:
+                        parser.add_option(*flag_option['on'], action="store_true", dest=flag_name)
+                    if 'off' in flag_option:
+                        parser.add_option(*flag_option['off'], action="store_false", dest=flag_name)
+            
             (options, command_args) = parser.parse_args() 
             plugin_class = getattr(command_info['module'], command_info['plugin'])
             plugin = plugin_class(configuration)
