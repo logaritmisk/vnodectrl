@@ -43,6 +43,7 @@ class PuppetPlugin(VnodectrlPlugin):
 
 		puppet_string = get_connection_string(puppet_node)
 		master_string = get_connection_string(master_node)
+		master_ip = master_node.public_ip[0]
 		puppet_args = {"host_string": puppet_string}
 		if "keyname" in puppet_node.extra:
 			key = find_key_file(puppet_node.extra['keyname'])
@@ -51,9 +52,17 @@ class PuppetPlugin(VnodectrlPlugin):
 		with fabric.api.settings(**puppet_args):
 			self.puppetConnect()
 	
-	def puppetConnect(self):
-		run('echo hej')
-		
+	def puppetConnect(self, master_ip):
+		"""
+		Connect the puppet client to the master.
+		"""
+		run('puppet agent --server {0} --waitforcert 60 --test'.format(master_ip))
+	
+	def puppetAccept(self, client_ip):
+		"""
+		Accept a client.
+		"""
+		run('puppet cert --sign --test'.format(client_ip))
 
 
 		
