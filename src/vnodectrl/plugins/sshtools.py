@@ -20,6 +20,11 @@ COMMANDS = {
 				"default": "ubuntu",
 				"description": "The remote user that should be returned."
 			},
+			"interactive": {
+				"option": "--interactive",
+				"default": True,
+				"description": "Provide interactive help if necessary."
+			}
 		}
 	},
 	"ssh-ec2-keyfile": {
