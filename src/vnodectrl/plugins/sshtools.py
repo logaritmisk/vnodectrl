@@ -1,5 +1,5 @@
 from vnodectrl.base import VnodectrlPlugin, libcloud_requirements
-from vnodectrl.base import libcloud_requirements
+from vnodectrl.base import libcloud_requirements, get_connection_string
 from os.path import isfile
 from os import getenv
 import sys; sys.path.append('..')
@@ -40,29 +40,27 @@ class SSHPlugin(VnodectrlPlugin):
 		
 	def execute(self, cmd, args, options):
 		driver = args[1]
-		node = args[2]
 		settings = self.config["drivers"].get(args[1], False)
 		conn = self.connect(driver, settings["id"], settings["key"])
-		# Fetch the appropriate node.
-		node = self.getNode(driver, conn, node)
+		if len(args) > 2:
+			node = args[2]
+			node = self.getNode(driver, conn, node)
+			print self.processNode(cmd, args, options, node)
+		else:
+			nodes = conn.list_nodes()
+			for current_node in nodes:
+				print "{0}({1}): {2}".format(current_node.name, current_node.id, self.processNode(cmd, args, options, current_node))
+	
+	def processNode(self, cmd, args, options, node):
 		if args[0] == 'ssh-connection-string':
-			return self.connectionString(node, options)
+			return get_connection_string(node, options.remote_user)
 		elif args[0] == 'ssh-ec2-keyfile':
 			home_key_file = "{0}/.vnodectrl.d/3.x/keys/{1}.pem".format(getenv("HOME"), node.extra['keyname']);
 			global_key_file = "/etc/vnodectrl/keys/{0}.pem".format(node.extra['keyname']);
 			if isfile(home_key_file):
-				print home_key_file
+				return home_key_file
 			elif isfile(global_key_file):
-				print global_key_file
+				return global_key_file
 			else:
-				print "The key file is not present on this system."
-		
-	def connectionString(self, node, options):
-		"""
-		get the connection string
-		"""
-		connection_string = node.public_ip[0];
-		if options.remote_user is not None:
-			connection_string = "{0}@{1}".format(options.remote_user, connection_string)
-		print connection_string
+				return "The key file is not present on this system."
 		

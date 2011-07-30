@@ -186,3 +186,10 @@ def get_provider(driver):
 		return get_driver(real_driver)
 	
 	return False
+
+def get_connection_string(node, remote_user="ubuntu"):
+	"""
+	Get the connection string for a particular node.
+	"""
+	connection_string = node.public_ip[0];
+	return "{0}@{1}".format(remote_user, connection_string)
