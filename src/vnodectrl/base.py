@@ -1,6 +1,8 @@
 import sys; sys.path.append('..')
 import utils
 import json
+from os import getenv
+from os.path import isfile
 try:
 	from libcloud.compute.types import Provider
 	from libcloud.compute.providers import get_driver
@@ -193,3 +195,15 @@ def get_connection_string(node, remote_user="ubuntu"):
 	"""
 	connection_string = node.public_ip[0];
 	return "{0}@{1}".format(remote_user, connection_string)
+
+def find_key_file(name):
+	"""
+	Find a key file for a specific keypair, if it is available.
+	"""
+	home_key_file = "{0}/.vnodectrl.d/3.x/keys/{1}.pem".format(getenv("HOME"), name);
+	global_key_file = "/etc/vnodectrl/keys/{0}.pem".format(name);
+	if isfile(home_key_file):
+		return home_key_file
+	elif isfile(global_key_file):
+		return global_key_file
+	return False

@@ -1,7 +1,5 @@
 from vnodectrl.base import VnodectrlPlugin, libcloud_requirements
 from vnodectrl.base import libcloud_requirements, get_connection_string
-from os.path import isfile
-from os import getenv
 import sys; sys.path.append('..')
 import json
 COMMANDS = {
@@ -60,12 +58,8 @@ class SSHPlugin(VnodectrlPlugin):
 		if args[0] == 'ssh-connection-string':
 			return get_connection_string(node, options.remote_user)
 		elif args[0] == 'ssh-ec2-keyfile':
-			home_key_file = "{0}/.vnodectrl.d/3.x/keys/{1}.pem".format(getenv("HOME"), node.extra['keyname']);
-			global_key_file = "/etc/vnodectrl/keys/{0}.pem".format(node.extra['keyname']);
-			if isfile(home_key_file):
-				return home_key_file
-			elif isfile(global_key_file):
-				return global_key_file
-			else:
-				return "The key file is not present on this system."
+			key_file = base.find_key_file(node.extra['keyname'])
+			if key_file:
+				return key_file
+			return "The key file is not present on this system."
 		
