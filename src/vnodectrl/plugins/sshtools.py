@@ -2,6 +2,7 @@ from vnodectrl.base import VnodectrlPlugin, libcloud_requirements
 from vnodectrl.base import libcloud_requirements, get_connection_string
 import sys; sys.path.append('..')
 import json
+from vnodectrl.base import find_key_file
 COMMANDS = {
 	"ssh-connection-string" : {
 		"description": "Get a working ssh connection string",
@@ -53,7 +54,7 @@ class SSHPlugin(VnodectrlPlugin):
 		if args[0] == 'ssh-connection-string':
 			return get_connection_string(node, options.remote_user)
 		elif args[0] == 'ssh-ec2-keyfile':
-			key_file = base.find_key_file(node.extra['keyname'])
+			key_file = find_key_file(node.extra['keyname'])
 			if key_file:
 				return key_file
 			return "The key file is not present on this system."
