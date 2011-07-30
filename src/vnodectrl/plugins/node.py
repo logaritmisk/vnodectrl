@@ -53,7 +53,7 @@ COMMANDS = {
 		},
 		"options": {
 			"format": {
-				"option": "--format",
+				"option": ["--format"],
 				"default": "default",
 				"description": "The format to output the data in. valid ones are:\njson\ndefault"
 			}
