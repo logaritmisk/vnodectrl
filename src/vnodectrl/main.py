@@ -31,7 +31,6 @@ def main(args):
                     if "type" not in option:
                         option['type'] = 'string'
                     parser.add_option(*option["option"], action="store", type=option['type'], default=option["default"])
-                    parser.add_option(*option["option"], action="store", type=option['type'], default=option["default"])
             if "flags" in command_info:
                 for flag_name, flag_option in command_info["flags"].iteritems():
                     if 'on' in flag_option:

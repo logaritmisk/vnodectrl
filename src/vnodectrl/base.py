@@ -149,16 +149,43 @@ class VnodectrlPlugin:
 		if len(args) > arg_index:
 			driver = args[arg_index]
 			settings = self.config["drivers"].get(args[1], False)
-		elif interactive:
+		if not settings and interactive:
 			driver, settings = dict_prompt(self.config["drivers"], "Driver")
 		return driver, settings
 	
-	def getNodeFromArg(self, args, arg_index, conn, interactive = False, message="Select node:"):
+	def getNodeFromArg(self, args, arg_index, driver, conn, interactive = False, message="Select node:"):
+		node = False
 		if len(args) > arg_index: 
 			node = self.getNode(driver, conn, args[arg_index])
-		else:
+		if not node and interactive:
 			nodes = conn.list_nodes()
 			return node_prompt(nodes, message=message)
+		return node
+	def getSizeFromArg(self, args, arg_index, driver, conn, interactive = False, message="Select size:"):
+		size = False
+		if len(args) > arg_index: 
+			size = size = self.getSize(driver, conn, args[arg_index])
+		if not size and interactive:
+			sizes = conn.list_sizes()
+			return size_prompt(sizes, message=message)
+		return size
+	def getImageFromArg(self, args, arg_index, driver, conn, interactive = False, message = "Enter the name of the image. Enter 0 to cancel."):
+		image = False
+		if len(args) > arg_index: 
+			image = self.getImage(driver, conn, args[arg_index])
+		if not image and interactive:
+			return self.imagePrompt(driver, conn, message)
+		return image
+	
+	def imagePrompt(self, driver, conn, message):
+		print message
+		image = str(raw_input())
+		if image == 0:
+			return False
+		image = self.getImage(driver, conn, image)
+		if not image:
+			return self.imagePrompt(driver, conn)
+		return image	
 
 class VnodectrlException(Exception):
 	def __init__(self, value):

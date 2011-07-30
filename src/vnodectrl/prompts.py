@@ -31,3 +31,17 @@ def node_prompt(nodes, message="Select a node:"):
     if len(nodes) >= option:
         return nodes[option-1]
     return node_prompt(nodes, message)
+
+def size_prompt(sizes, message="Select a size:"):
+    print message
+    print "0. Cancel"
+    i = 1
+    for size in sizes:
+        print "{0}. {1}".format(i, "{0}({1})".format(size.name, size.id))
+        i += 1
+    option = int(input())
+    if option == 0:
+        return False
+    if len(sizes) >= option:
+        return sizes[option-1]
+    return size_prompt(sizes, message)
