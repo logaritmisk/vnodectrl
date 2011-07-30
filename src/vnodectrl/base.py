@@ -3,6 +3,7 @@ import utils
 import json
 from os import getenv
 from os.path import isfile
+from vnodectrl.prompts import *
 try:
 	from libcloud.compute.types import Provider
 	from libcloud.compute.providers import get_driver
@@ -141,6 +142,23 @@ class VnodectrlPlugin:
 			print "Extra:"
 			for key, value in node.extra.iteritems():
 				print "\t{0}: {1}".format(key, value)
+	
+	def getDriverFromArg(self, args, arg_index, interactive = True):
+		driver = False
+		settings = False
+		if len(args) > arg_index:
+			driver = args[arg_index]
+			settings = self.config["drivers"].get(args[1], False)
+		elif interactive:
+			driver, settings = dict_prompt(self.config["drivers"], "Driver")
+		return driver, settings
+	
+	def getNodeFromArg(self, args, arg_index, conn, interactive = False, message="Select node:"):
+		if len(args) > arg_index: 
+			node = self.getNode(driver, conn, args[arg_index])
+		else:
+			nodes = conn.list_nodes()
+			return node_prompt(nodes, message=message)
 
 class VnodectrlException(Exception):
 	def __init__(self, value):

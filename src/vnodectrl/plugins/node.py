@@ -79,8 +79,7 @@ class NodeCreatePlugin(VnodectrlPlugin):
 	def execute(self, cmd, args, options):
 		self.format = options.format
 		if len(args) < 5:
-			self.printError("You must specify your provider and an image to use.")
-			return self.finalize()
+			return self.printError("You must specify your provider and an image to use.")
 		
 		driver = args[1]
 		if base.get_provider(driver) == False:

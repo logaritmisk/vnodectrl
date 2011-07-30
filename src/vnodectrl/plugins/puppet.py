@@ -14,6 +14,13 @@ COMMANDS = {
 			"puppet": "The node to connect",
 			"master": "The master node"
 		},
+		"options": {
+			"interactive": {
+				"option": "--interactive",
+				"default": True,
+				"description": "Ask for arguments if they are missing."
+			}
+		}
 	},
 }
 
@@ -22,25 +29,10 @@ class PuppetPlugin(VnodectrlPlugin):
 		self.config = config;
 		
 	def execute(self, cmd, args, options):
-		if len(args) > 1:
-			settings = self.config["drivers"].get(args[1], False)
-		else:
-			driver, settings = dict_prompt(self.config["drivers"], "Driver")
-			if not driver:
-				return False
+		driver, settings = self.getDriverFromArg(args, 1, options.interactive);
 		conn = self.connect(driver, settings["id"], settings["key"])
-		if len(args) > 2: 
-			puppet_node = self.getNode(driver, conn, args[2])
-		else:
-			nodes = conn.list_nodes()
-			puppet_node = node_prompt(nodes, message="Select the puppet node:")
-		if len(args) > 3:
-			master_node = self.getNode(driver, conn, puppet_name)
-		else:
-			if not nodes:
-				nodes = conn.list_nodes() 
-			master_node = node_prompt(nodes, message="Select the master node:")
-
+		puppet_node = self.getNodeFromArg(args, 2, conn, options.interactive, "Select puppet node:")
+		master_node = self.getNodeFromArg(args, 3, conn, options.interactive, "Select master node:")
 		puppet_string = get_connection_string(puppet_node)
 		master_string = get_connection_string(master_node)
 		master_ip = master_node.public_ip[0]
