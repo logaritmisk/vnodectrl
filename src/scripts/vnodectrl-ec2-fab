@@ -1,0 +1,8 @@
+#!/bin/bash
+# This script let's you execute a fab file on a virtual host on amazon ec2 using the key specified by the nodes key pair
+
+driver=$1
+name=$2
+method=$3
+
+fab -i $(vnodectrl ssh-ec2-keyfile $driver $name) install_puppet_master:host=$(vnodectrl ssh-connection-string $driver $name)
