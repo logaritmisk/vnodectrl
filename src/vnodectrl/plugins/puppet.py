@@ -30,8 +30,8 @@ class PuppetPlugin(VnodectrlPlugin):
 	def execute(self, cmd, args, options):
 		driver, settings = self.getDriverFromArg(args, 1, options.interactive);
 		conn = self.connect(driver, settings["id"], settings["key"])
-		puppet_node = self.getNodeFromArg(args, 2, conn, options.interactive, "Select puppet node:")
-		master_node = self.getNodeFromArg(args, 3, conn, options.interactive, "Select master node:")
+		puppet_node = self.getNodeFromArg(args, 2, driver, conn, options.interactive, "Select puppet node:")
+		master_node = self.getNodeFromArg(args, 3, driver, conn, options.interactive, "Select master node:")
 		puppet_string = get_connection_string(puppet_node)
 		master_string = get_connection_string(master_node)
 		master_ip = master_node.public_ip[0]
