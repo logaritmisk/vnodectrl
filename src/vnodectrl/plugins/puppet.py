@@ -40,25 +40,31 @@ class PuppetPlugin(VnodectrlPlugin):
 		else:
 			master_addr = master_node.public_ip[0]
 			puppet_addr = master_node.public_ip[0]
-
-		puppet_string = get_connection_string(puppet_node)
-		master_string = get_connection_string(master_node)
-		puppet_args = {"host_string": puppet_string}
-		if "keyname" in puppet_node.extra:
-			key = find_key_file(puppet_node.extra['keyname'])
-			if key:
-				puppet_args['key_filename'] = key
+		puppet_args = self.getFabricArgs(puppet_node)
+		master_args = self.getFabricArgs(master_node)
 		with fabric.api.settings(**puppet_args):
 			self.puppetConnect(master_addr)
+		with fabric.api.settings(**master_args):
+			self.puppetSign(puppet_addr)
+	
+	def getFabricArgs(self, node):
+		connection_string = get_connection_string(node)
+		args = {"host_string": connection_string}
+		if "keyname" in node.extra:
+			key = find_key_file(node.extra['keyname'])
+			if key:
+				args['key_filename'] = key
+		return args
 	
 	def puppetConnect(self, master_addr):
 		"""
 		Connect the puppet client to the master.
 		"""
-		sudo('puppet agent --server {0} --waitforcert 60 --test'.format(master_addr))
+		sudo('puppet agent --server {0} --waitforcert=60 --verbose'.format(master_addr))
 	
-	def puppetAccept(self, client_addr):
+	def puppetSign(self, client_addr):
 		"""
 		Accept a client.
 		"""
-		sudo('puppet cert --sign'.format(client_addr))
+		sudo('puppet cert --sign {0}'.format(client_addr))
+		
