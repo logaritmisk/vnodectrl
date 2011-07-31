@@ -32,28 +32,33 @@ class PuppetPlugin(VnodectrlPlugin):
 		conn = self.connect(driver, settings["id"], settings["key"])
 		puppet_node = self.getNodeFromArg(args, 2, driver, conn, options.interactive, "Select puppet node:")
 		master_node = self.getNodeFromArg(args, 3, driver, conn, options.interactive, "Select master node:")
+		# EC2 servers use their private dns as fqdn, so we can use that to connect puppet clients.
+		if 'private_dns' in puppet_node.extra:
+			master_addr = master_node.extra['private_dns']
+			puppet_addr = puppet_node.extra['private_dns']
+		# Use public address as fallback.
+		else:
+			master_addr = master_node.public_ip[0]
+			puppet_addr = master_node.public_ip[0]
+
 		puppet_string = get_connection_string(puppet_node)
 		master_string = get_connection_string(master_node)
-		master_ip = master_node.public_ip[0]
 		puppet_args = {"host_string": puppet_string}
 		if "keyname" in puppet_node.extra:
 			key = find_key_file(puppet_node.extra['keyname'])
 			if key:
 				puppet_args['key_filename'] = key
 		with fabric.api.settings(**puppet_args):
-			self.puppetConnect(master_ip)
+			self.puppetConnect(master_addr)
 	
-	def puppetConnect(self, master_ip):
+	def puppetConnect(self, master_addr):
 		"""
 		Connect the puppet client to the master.
 		"""
-		run('puppet agent --server {0} --waitforcert 60 --test'.format(master_ip))
+		sudo('puppet agent --server {0} --waitforcert 60 --test'.format(master_addr))
 	
-	def puppetAccept(self, client_ip):
+	def puppetAccept(self, client_addr):
 		"""
 		Accept a client.
 		"""
-		run('puppet cert --sign --test'.format(client_ip))
-
-
-		
+		sudo('puppet cert --sign'.format(client_addr))
