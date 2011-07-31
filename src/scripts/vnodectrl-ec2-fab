@@ -5,4 +5,4 @@ driver=$1
 name=$2
 method=$3
 
-fab -i $(vnodectrl ssh-ec2-keyfile $driver $name) install_puppet_master:host=$(vnodectrl ssh-connection-string $driver $name)
+fab -i $(vnodectrl ssh-ec2-keyfile $driver $name) $method:host=$(vnodectrl ssh-connection-string $driver $name)
